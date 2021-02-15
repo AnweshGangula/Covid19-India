@@ -18,10 +18,15 @@ const render = data => {
 var minDate = d3.min(data.map(function(d) { return d.Date_YMD; }));
 var maxDate = d3.max(data.map(function(d) { return d.Date_YMD; }));
 
-var x = d3.scaleBand()
-            .domain(d3.range(data.length))
-            .range([margin.left, width - margin.right])
-            .padding(0.1)
+var x = d3
+  .scaleBand()
+  .domain(
+    data.map(function(d) {
+        return d.Date_YMD;
+      })
+  )
+  .range([margin.left, width - margin.right])
+  .padding(0.1);
 
 var y = d3.scaleLinear()
             .domain([0, d3.max(data, d => d.TT)*1.1])
@@ -33,7 +38,7 @@ svg
     .selectAll("rect")
     .data(data)
     .join("rect")
-        .attr("x", (d, i) => x(i))
+        .attr("x", (d) => x(d.Date_YMD))
         .attr('title', (d) => d.TT)
         .attr("class", "rect")
         .attr("width", x.bandwidth())
@@ -51,11 +56,23 @@ function yAxis(g) {
         // .attr("font-size", '20px')
 }
 
+var time_extent = d3.extent(data, function (d) {
+  return d.Date_YMD;
+});
+
+var calendar = d3.timeMonth
+//   .every(1)
+  .range(new Date(time_extent[0]), new Date(time_extent[1]))
+//   .timeFormat("%Y-%m-%d");
+
+
 function xAxis(g) {
-    g.attr("transform", `translate(0,${height - margin.bottom})`)
-        .call(d3.axisBottom(x)
-        .ticks(d3.timeMonth.every(4))
-        .tickFormat(i => data[i].Date_YMD))
+    g.attr("transform", `translate(0,${height - margin.bottom})`).call(
+      d3.axisBottom(x)
+        .tickValues(calendar)
+        .tickSizeInner(1)
+        .tickFormat(d3.timeFormat("%b-%y"))
+    );
         // .attr("font-size", '20px')
 }
 
