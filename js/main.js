@@ -2,102 +2,211 @@
 var parseDate = d3.timeParse("%Y-%m-%d");
 
 // Set the dimensions of the canvas / graph
-var margin = {top: 30, right: 20, bottom: 30, left: 50},
-    width = 1600,
-    height = 300;
+var margin = { top: 30, right: 20, bottom: 30, left: 50 },
+  width = 1600,
+  height = 300;
 
-// Adds the svg canvas
-var svg = d3.select("#d3line")
-.append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .attr("viewBox", [0, 0, width, height]);
+const Daily_Cases_Bar = (data) => {
+  // Adds the svg canvas
+          var Daily_Cases = d3
+                        .select("#d3line")
+                        .append("svg")
+                        .attr("width", width + margin.left + margin.right)
+                        .attr("height", height + margin.top + margin.bottom)
+                        .attr("viewBox", [0, 0, width, height])
+                        .classed("svg-container", true);
 
-const render = data => {
-    // Set the ranges
-var minDate = d3.min(data.map(function(d) { return d.Date_YMD; }));
-var maxDate = d3.max(data.map(function(d) { return d.Date_YMD; }));
-
-var x = d3
-  .scaleBand()
-  .domain(
-    data.map(function(d) {
+  var x = d3
+    .scaleBand()
+    .domain(
+      data.map(function (d) {
         return d.Date_YMD;
       })
-  )
-  .range([margin.left, width - margin.right])
-  .padding(0.1);
+    )
+    .range([margin.left, width - margin.right])
+    .padding(0.1);
 
-var y = d3.scaleLinear()
-            .domain([0, d3.max(data, d => d.TT)*1.1])
-            .range([height - margin.bottom, margin.top])
+  var y = d3
+    .scaleLinear()
+    .domain([0, d3.max(data, (d) => d.TT) * 1.1])
+    .range([height - margin.bottom, margin.top]);
 
-svg
-    .append("g")
-    .attr("fill", 'royalblue')
+  Daily_Cases.append("g")
+    .attr("fill", "royalblue")
     .selectAll("rect")
     .data(data)
     .join("rect")
-        .attr("x", (d) => x(d.Date_YMD))
-        .attr('title', (d) => d.TT)
-        .attr("class", "rect")
-        .attr("width", x.bandwidth())
+    .attr("x", (d) => x(d.Date_YMD))
+    .attr("title", (d) => d.TT)
+    .attr("class", "rect")
+    .attr("width", x.bandwidth())
 
-        .attr("height", 0) // always equal to 0
-        .attr("y", function(d) { return y(0); })
+    .attr("height", 0) // always equal to 0
+    .attr("y", function (d) {
+      return y(0);
+    });
 
-        // .attr("y", d => y(d.TT))
-        // .attr("height", d => y(0) - y(d.TT))
-        
+  // .attr("y", d => y(d.TT))
+  // .attr("height", d => y(0) - y(d.TT))
 
-function yAxis(g) {
-    g.attr("transform", `translate(${margin.left}, 0)`)
-        .call(d3.axisLeft(y).ticks(null, data.format))
-        // .attr("font-size", '20px')
-}
+  function yAxis(g) {
+    g.attr("transform", `translate(${margin.left}, 0)`).call(
+      d3.axisLeft(y).ticks(null, data.format)
+    );
+    // .attr("font-size", '20px')
+  }
 
-var time_extent = d3.extent(data, function (d) {
-  return d.Date_YMD;
-});
+  var time_extent = d3.extent(data, function (d) {
+    return d.Date_YMD;
+  });
 
-var calendar = d3.timeMonth
-//   .every(1)
-  .range(new Date(time_extent[0]), new Date(time_extent[1]))
-//   .timeFormat("%Y-%m-%d");
+  var calendar = d3.timeMonth
+    //   .every(1)
+    .range(new Date(time_extent[0]), new Date(time_extent[1]));
+  //   .timeFormat("%Y-%m-%d");
 
-
-function xAxis(g) {
+  function xAxis(g) {
     g.attr("transform", `translate(0,${height - margin.bottom})`).call(
-      d3.axisBottom(x)
+      d3
+        .axisBottom(x)
         .tickValues(calendar)
         .tickSizeInner(1)
         .tickFormat(d3.timeFormat("%b-%y"))
     );
-        // .attr("font-size", '20px')
-}
+    // .attr("font-size", '20px')
+  }
 
-// Animation
-svg.selectAll("rect")
-  .transition()
-  .duration(800)
-  .attr("y", function(d) { return y(d.TT); })
-  .attr("height", d => y(0) - y(d.TT))
-  .delay(function(d,i){return(i*(data.length/60))})
-
-svg.append("g").call(xAxis);
-svg.append("g").call(yAxis);
-svg.node();
-    
-}
-
-d3.csv("./Resources/state_wise_daily.csv").then(function(All_data){
-    All_data.forEach(function(d) {
-        d.Date_YMD = parseDate(d.Date_YMD);
-        d.TT = +d.TT;
+  // Animation
+  Daily_Cases.selectAll("rect")
+    .transition()
+    .duration(800)
+    .attr("y", function (d) {
+      return y(d.TT);
+    })
+    .attr("height", (d) => y(0) - y(d.TT))
+    .delay(function (d, i) {
+      return i * (data.length / 60);
     });
-    var data = All_data.filter(function(d) { return d.Status === "Confirmed" ; });
-    // console.log(data[0].Date_YMD + " is of type " + typeof(data[0].Date_YMD));
-    console.log(data.length);
 
-    render(data);
+  Daily_Cases.append("g").call(yAxis);
+  Daily_Cases.append("g").call(xAxis);
+  Daily_Cases.node();
+};
+
+const Daily_Case_Line = (data) => {
+  var x = d3.scaleTime().range([margin.left, width - margin.right]);
+  var y = d3.scaleLinear().range([height - margin.bottom, margin.top]);
+
+  var Confirmed_data = data.filter(function (d) {
+    return d.Status === "Confirmed" /* && d.TT < 5000 */;
+  });
+  var Recovered_data = data.filter(function (d) {
+    return d.Status === "Recovered" /* && d.TT < 5000 */;
+  });
+
+  // define the 1st line
+  var valueline = d3
+    .line()
+    .x(function (d) {
+      return x(d.Date_YMD);
+    })
+    .y(function (d) {
+      return y(d.TT);
+    })
+    .curve(d3.curveNatural); //curves the line
+
+  // define the 2nd line
+  var valueline2 = d3
+    .line()
+    .x(function (d) {
+      return x(d.Date_YMD);
+    })
+    // .y(function(d) { return y(d['DL - Delhi']); });
+    .y(function (d) {
+      return y(d.TT);
+    })
+    .curve(d3.curveNatural);; //curves the line
+
+  // append the svg obgect to the body of the page
+  // appends a 'group' element to 'svg'
+  // moves the 'group' element to the top left margin
+  var Line_Chart = d3
+    .select("#d3line")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .attr("viewBox", [0, 0, width, height])
+    .classed("svg-container", true);
+
+  // Scale the range of the data
+  x.domain(
+    d3.extent(data, function (d) {
+      return d.Date_YMD;
+    })
+  );
+  y.domain([
+    0,
+    d3.max(data, function (d) {
+      return Math.max(d.TT, d.DD);
+    }),
+  ]);
+
+  // Add the X Axis
+  Line_Chart.append("g")
+    .attr("transform", `translate(0,${height - margin.bottom})`)
+    .call(d3.axisBottom(x));
+
+  // Add the Y Axis
+  Line_Chart.append("g")
+    .attr("transform", `translate(${margin.left}, 0)`)
+    .call(d3.axisLeft(y));
+
+  // Add the valueline path.
+  path = Line_Chart.append("path")
+    .data([Confirmed_data])
+    .attr("class", "line")
+    .attr("id", "line 0")
+    .attr("d", valueline)
+    .attr("fill", "none")
+    .attr("stroke-width", 4)
+    .attr("stroke", "#491EC4");
+
+  // Add the valueline2 path.
+  path2 = Line_Chart.append("path")
+    .data([Recovered_data])
+    .attr("class", "line")
+    .attr("id", "line 1")
+    .attr("d", valueline2)
+    .attr("fill", "none")
+    .attr("stroke-width", 4)
+    .attr("stroke", "green");
+
+  // Animation
+  // Reference link: https://observablehq.com/@onoratod/animate-a-path-in-d3
+  const length = path.node().getTotalLength();
+  path
+  .attr("stroke-dasharray", length + " " + length)
+  .attr("stroke-dashoffset", length)
+    .transition()
+    .ease(d3.easeLinear)
+    .attr("stroke-dashoffset", 0)
+    .duration(6000)
+};
+
+d3.csv("./Resources/state_wise_daily.csv").then(function (All_data) {
+  All_data.forEach(function (d) {
+    d.Date_YMD = parseDate(d.Date_YMD);
+    d.TT = +d.TT;
+  });
+  var Confirmed_data = All_data.filter(function (d) {
+    return d.Status === "Confirmed" /* && d.TT < 5000 */;
+  });
+  var Recovered_data = All_data.filter(function (d) {
+    return d.Status === "Recovered" /* && d.TT < 5000 */;
+  });
+  // console.log(data[0].Date_YMD + " is of type " + typeof(data[0].Date_YMD));
+  console.log(Confirmed_data[0]);
+
+  Daily_Cases_Bar(Confirmed_data);
+  Daily_Case_Line(All_data);
 });
