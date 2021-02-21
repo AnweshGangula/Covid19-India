@@ -36,7 +36,7 @@ const Daily_Cases_Bar = (data) => {
 
   var y = d3
     .scaleLinear()
-    .domain([0, d3.max(data, (d) => d.TT) * 1.1])
+    .domain([0, d3.max(data, (d) => d.Confirmed) * 1.1])
     .range([height - margin.bottom, margin.top]);
 
   Daily_Cases.append("g")
@@ -45,7 +45,7 @@ const Daily_Cases_Bar = (data) => {
     .data(data)
     .join("rect")
     .attr("x", (d) => x(d.Date_YMD))
-    .attr("title", (d) => d.TT)
+    .attr("title", (d) => d.Confirmed)
     .attr("class", "rect")
     .attr("width", x.bandwidth())
 
@@ -85,9 +85,9 @@ const Daily_Cases_Bar = (data) => {
     .transition()
     .duration(800)
     .attr("y", function (d) {
-      return y(d.TT);
+      return y(d.Confirmed);
     })
-    .attr("height", (d) => y(0) - y(d.TT))
+    .attr("height", (d) => y(0) - y(d.Confirmed))
     .delay(function (d, i) {
       return i * (data.length / 60);
     });
@@ -101,13 +101,6 @@ const Daily_Case_Line = (data) => {
   var x = d3.scaleTime().range([margin.left, width - margin.right]);
   var y = d3.scaleLinear().range([height - margin.bottom, margin.top]);
 
-  var Confirmed_data = data.filter(function (d) {
-    return d.Status === "Confirmed" /* && d.TT < 5000 */;
-  });
-  var Recovered_data = data.filter(function (d) {
-    return d.Status === "Recovered" /* && d.TT < 5000 */;
-  });
-
   // define the 1st line
   var valueline = d3
     .line()
@@ -115,7 +108,7 @@ const Daily_Case_Line = (data) => {
       return x(d.Date_YMD);
     })
     .y(function (d) {
-      return y(d.TT);
+      return y(d.Confirmed);
     })
     .curve(d3.curveNatural); //curves the line
 
@@ -127,7 +120,7 @@ const Daily_Case_Line = (data) => {
     })
     // .y(function(d) { return y(d['DL - Delhi']); });
     .y(function (d) {
-      return y(d.TT);
+      return y(d.Recovered);
     })
     .curve(d3.curveNatural); //curves the line
 
@@ -151,7 +144,7 @@ const Daily_Case_Line = (data) => {
   y.domain([
     0,
     d3.max(data, function (d) {
-      return Math.max(d.TT, d.DD);
+      return Math.max(d.Confirmed, d.Recovered);
     }) * 1.1,
   ]);
 
@@ -167,7 +160,7 @@ const Daily_Case_Line = (data) => {
 
   // Add the valueline path.
   path = Line_Chart.append("path")
-    .data([Confirmed_data])
+    .data([data])
     .attr("class", "line")
     .attr("id", "line 0")
     .attr("d", valueline)
@@ -177,7 +170,7 @@ const Daily_Case_Line = (data) => {
 
   // Add the valueline2 path.
   path2 = Line_Chart.append("path")
-    .data([Recovered_data])
+    .data([data])
     .attr("class", "line")
     .attr("id", "line 1")
     .attr("d", valueline2)
@@ -200,13 +193,6 @@ const Daily_Case_Line = (data) => {
 const Active_Case_Line = (data) => {
   var x = d3.scaleTime().range([margin.left, width - margin.right]);
   var y = d3.scaleLinear().range([height - margin.bottom, margin.top]);
-
-  var Confirmed_data = data.filter(function (d) {
-    return d.Status === "Confirmed" /* && d.TT < 5000 */;
-  });
-  var Recovered_data = data.filter(function (d) {
-    return d.Status === "Recovered" /* && d.TT < 5000 */;
-  });
 
   // define animation line at 0
   var starting_valueline = d3
@@ -261,7 +247,7 @@ const Active_Case_Line = (data) => {
 
   // Add the valueline path.
   path = Line_Chart.append("path")
-    .data([Confirmed_data])
+    .data([data])
     .attr("class", "line")
     .attr("id", "line 0")
     .attr("d", starting_valueline)
@@ -274,21 +260,22 @@ const Active_Case_Line = (data) => {
   path.transition().ease(d3.easeBackOut).duration(2000).attr("d", valueline);
 };
 
-d3.csv("./Resources/state_wise_daily.csv").then(function (All_data) {
+d3.csv("./Resources/state_wise_daily_Query.csv").then(function (All_data) {
   All_data.forEach(function (d) {
     d.Date_YMD = parseDate(d.Date_YMD);
-    d.TT = +d.TT;
+    d.Confirmed = +d.Confirmed;
+    d.Recovered = +d.Recovered;
+    d.Deceased = +d.Deceased;
+    d.Actual = +d.Actual;
   });
-  var Confirmed_data = All_data.filter(function (d) {
-    return d.Status === "Confirmed" /* && d.TT < 5000 */;
+  var Total_data = All_data.filter(function (d) {
+    return d["State Abbr"] === "_TT" /* && d.TT < 5000 */;
   });
-  var Recovered_data = All_data.filter(function (d) {
-    return d.Status === "Recovered" /* && d.TT < 5000 */;
-  });
-  // console.log(data[0].Date_YMD + " is of type " + typeof(data[0].Date_YMD));
-  console.log(Confirmed_data[0]);
 
-  Daily_Cases_Bar(Confirmed_data);
-  Active_Case_Line(Confirmed_data);
-  Daily_Case_Line(All_data);
+  // console.log(data[0].Date_YMD + " is of type " + typeof(data[0].Date_YMD));
+  // console.log(typeof(All_data[0].Confirmed));
+
+  Daily_Cases_Bar(Total_data);
+  Active_Case_Line(Total_data);
+  Daily_Case_Line(Total_data);
 });
