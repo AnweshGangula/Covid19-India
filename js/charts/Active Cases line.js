@@ -60,7 +60,7 @@ class Active_Case_Line {
   drawLine() {
     const visual = this.plot.append("g");
     // define animation line at 0
-    const starting_valueline = d3
+    const valueline_start = d3
       .line()
       .x((d) => this.xScale(d.Date_YMD))
       .y((d) => this.height - this.margin.bottom)
@@ -68,34 +68,62 @@ class Active_Case_Line {
     //curves the line
 
     // define the 1st line
-    const valueline = d3
+    const valueline_animate = d3
       .line()
       .x((d) => this.xScale(d.Date_YMD))
       .y((d) => this.yScale(d.Active))
       .curve(d3.curveNatural); //curves the line
 
-    const area = d3
+    const area_path_start = d3
+      .area()
+      .x((d) => this.xScale(d.Date_YMD))
+      .y0(this.yScale(0))
+      .y1(this.yScale(0));
+
+    const area_path_animate = d3
       .area()
       .x((d) => this.xScale(d.Date_YMD))
       .y0(this.yScale(0))
       .y1((d) => this.yScale(d.Active));
 
-    // Add the valueline path.
     const path = visual
       .append("path")
       .data([this.data])
       .attr("class", "line")
       .attr("id", "line 0")
-      .attr("d", starting_valueline)
+      .attr("d", valueline_start)
       .attr("fill", "none")
       .attr("stroke-width", 4)
       .attr("stroke", "#491EC4");
     //   .attr("fill", "#cce5df")
     //   .attr("d", area);
 
+    const area = visual
+      .append("path")
+      .data([this.data])
+      .attr("fill", "#cce5df")
+      .attr("d", area_path_start);
+
     // Animation
     // Reference link: https://observablehq.com/@onoratod/animate-a-path-in-d3
-    path.transition().ease(d3.easeBackOut).duration(1000).attr("d", valueline);
+    path
+      
+      .transition()
+      
+      .ease(d3.easeBackOut)
+      
+      .duration(2000)
+      
+      .attr("d", valueline_animate);
+    area
+      
+      .transition()
+      
+      .ease(d3.easeBackOut)
+      
+      .duration(2000)
+      
+      .attr("d", area_path_animate);
   }
 }
 
