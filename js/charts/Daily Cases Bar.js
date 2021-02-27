@@ -1,3 +1,4 @@
+var formatTime = d3.timeFormat("%e %B");
 class Daily_Cases_Bar {
   constructor(element, data, height, width, margin) {
     this.element = element;
@@ -55,6 +56,13 @@ class Daily_Cases_Bar {
 
   drawBars() {
     const visual = this.plot.append("g");
+
+    const tooltip_div = d3
+      .select(this.element)
+      .append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
+  
     visual
       .selectAll("rect")
       .data(this.data)
@@ -63,11 +71,21 @@ class Daily_Cases_Bar {
       .attr("title", (d) => d.Confirmed)
       .attr("class", "rect")
       .attr("width", this.xScale.bandwidth())
-
       .attr("height", 0) // always equal to 0
-      .attr("y", (d) => this.yScale(0));
-    // .attr("y", d => y(d.TT))
-    // .attr("height", d => y(0) - y(d.TT))
+      .attr("y", (d) => this.yScale(0))
+      // .attr("y", d => y(d.TT))
+      // .attr("height", d => y(0) - y(d.TT))
+      .on("mouseover", function (event, d) {
+        const no_cases = d.Confirmed.toLocaleString();
+        tooltip_div.transition().duration(200).style("opacity", 0.9);
+        tooltip_div
+          .html("<b>" + formatTime(d.Date_YMD) + "</b>" + "<br/>" + no_cases)
+          .style("left", event.pageX + "px")
+          .style("top", event.pageY - 38 + "px");
+      })
+      .on("mouseout", function (d) {
+        tooltip_div.transition().duration(500).style("opacity", 0);
+      });
 
     // Animation
     const dataLength = d3.selectAll(this.data).size();

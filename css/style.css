@@ -3,3 +3,23 @@
     height: 100%;
     min-width: 1200px;
 }
+
+div.tooltip {
+    position: absolute;
+    text-align: center;
+    /* width: 60px; */
+    /* height: 28px; */
+    padding: 5px;
+    font: 12px sans-serif;
+    background: lightsteelblue;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+    transform: translate(-50%, 0);
+  }
+
+rect.rect:hover {
+    fill: cadetblue;
+    opacity: 0.7;
+    stroke: darkcyan;
+}
