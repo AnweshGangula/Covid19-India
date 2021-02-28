@@ -4,4 +4,14 @@ var Global_Var = {
   height: 300,
 };
 
+function formatDate(date) {
+  return date.toLocaleString("en", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+}
+
 export default Global_Var;
+export { formatDate };

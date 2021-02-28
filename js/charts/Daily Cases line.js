@@ -51,17 +51,19 @@ class Daily_Case_Line {
     this.plot
       .append("g")
       .attr("transform", `translate(0,${gVar.height - gVar.margin.bottom})`)
-      .call(d3.axisBottom(this.xScale));
+      .call(d3.axisBottom(this.xScale))
+      .attr("class", "x-axis");
 
     // Add the Y Axis
     this.plot
       .append("g")
       .attr("transform", `translate(${gVar.margin.left}, 0)`)
-      .call(d3.axisLeft(this.yScale));
+      .call(d3.axisLeft(this.yScale))
+      .attr("class", "y-axis");;
   }
 
   drawLines() {
-    const visual = this.plot.append("g");
+    const visual = this.plot.append("g").attr("class", "chart");
 
     // define the 1st line
     const valueline = d3

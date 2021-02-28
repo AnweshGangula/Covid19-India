@@ -54,13 +54,7 @@ class Daily_Cases_Bar {
   }
 
   drawBars() {
-    const visual = this.plot.append("g");
-
-    const tooltip_div = d3
-      .select(this.element)
-      .append("div")
-      .attr("class", "tooltip")
-      .style("opacity", 0);
+    const visual = this.plot.append("g").attr("class", "chart");
 
     visual
       .selectAll("rect")
@@ -72,9 +66,19 @@ class Daily_Cases_Bar {
       .attr("width", this.xScale.bandwidth())
       .attr("height", 0) // always equal to 0
       .attr("y", (d) => this.yScale(0))
-      // .attr("y", d => y(d.TT))
-      // .attr("height", d => y(0) - y(d.TT))
-      .on("mouseover", function (event, d) {
+      // .attr("y", (d) => y(d.TT))
+      // .attr("height", (d) => y(0) - y(d.TT));
+
+    // Tooltip
+    const tooltip_div = d3
+      .select(this.element)
+      .append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
+
+    visual
+      .selectAll("rect")
+      .on("touchmove mousemove", function (event, d) {
         const no_cases = d.Confirmed.toLocaleString();
         tooltip_div.transition().duration(200).style("opacity", 0.9);
         tooltip_div
@@ -82,7 +86,7 @@ class Daily_Cases_Bar {
           .style("left", event.pageX + "px")
           .style("top", event.pageY - 38 + "px");
       })
-      .on("mouseout", function (d) {
+      .on("touchend mouseleave", function (d) {
         tooltip_div.transition().duration(500).style("opacity", 0);
       });
 
@@ -110,10 +114,13 @@ class Daily_Cases_Bar {
     this.plot
       .append("g")
       .attr("transform", `translate(${gVar.margin.left}, 0)`)
+      .attr("class", "x-axis")
       .call(yAxis);
+
     this.plot
       .append("g")
       .attr("transform", `translate(0,${gVar.height - gVar.margin.bottom})`)
+      .attr("class", "y-axis")
       .call(xAxis);
   }
 }
