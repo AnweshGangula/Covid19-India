@@ -1,10 +1,9 @@
+import gVar from "../global var.js";
+
 class Active_Case_Line {
-  constructor(element, data, height, width, margin) {
+  constructor(element, data) {
     this.element = element;
     this.data = data;
-    this.height = height;
-    this.width = width;
-    this.margin = margin;
 
     this.draw();
   }
@@ -15,9 +14,9 @@ class Active_Case_Line {
     const chart = d3
       .select(this.element)
       .append("svg")
-      .attr("width", this.width + this.margin.left + this.margin.right)
-      .attr("height", this.height + this.margin.top + this.margin.bottom)
-      .attr("viewBox", [0, 0, this.width, this.height])
+      .attr("width", gVar.width + gVar.margin.left + gVar.margin.right)
+      .attr("height", gVar.height + gVar.margin.top + gVar.margin.bottom)
+      .attr("viewBox", [0, 0, gVar.width, gVar.height])
       .classed("svg-container", true);
 
     this.plot = chart.append("g").attr("fill", "royalblue");
@@ -30,7 +29,7 @@ class Active_Case_Line {
   createScales() {
     this.xScale = d3
       .scaleTime()
-      .range([this.margin.left, this.width - this.margin.right])
+      .range([gVar.margin.left, gVar.width - gVar.margin.right])
       .domain(
         d3.extent(this.data, function (d) {
           return d.Date_YMD;
@@ -39,7 +38,7 @@ class Active_Case_Line {
 
     this.yScale = d3
       .scaleLinear()
-      .range([this.height - this.margin.bottom, this.margin.top])
+      .range([gVar.height - gVar.margin.bottom, gVar.margin.top])
       .domain([0, d3.max(this.data, (d) => d.Active) * 1.1]);
   }
 
@@ -47,13 +46,13 @@ class Active_Case_Line {
     // Add the X Axis
     this.plot
       .append("g")
-      .attr("transform", `translate(0,${this.height - this.margin.bottom})`)
+      .attr("transform", `translate(0,${gVar.height - gVar.margin.bottom})`)
       .call(d3.axisBottom(this.xScale));
 
     // Add the Y Axis
     this.plot
       .append("g")
-      .attr("transform", `translate(${this.margin.left}, 0)`)
+      .attr("transform", `translate(${gVar.margin.left}, 0)`)
       .call(d3.axisLeft(this.yScale));
   }
 
@@ -63,7 +62,7 @@ class Active_Case_Line {
     const valueline_start = d3
       .line()
       .x((d) => this.xScale(d.Date_YMD))
-      .y((d) => this.height - this.margin.bottom)
+      .y((d) => gVar.height - gVar.margin.bottom)
       .curve(d3.curveNatural);
     //curves the line
 
@@ -90,7 +89,7 @@ class Active_Case_Line {
       .append("path")
       .data([this.data])
       .attr("class", "line")
-      .attr("id", "line 0")
+      .attr("id", "Active Line")
       .attr("d", valueline_start)
       .attr("fill", "none")
       .attr("stroke-width", 4)
@@ -107,22 +106,15 @@ class Active_Case_Line {
     // Animation
     // Reference link: https://observablehq.com/@onoratod/animate-a-path-in-d3
     path
-      
       .transition()
-      
       .ease(d3.easeBackOut)
-      
       .duration(2000)
-      
       .attr("d", valueline_animate);
+
     area
-      
       .transition()
-      
       .ease(d3.easeBackOut)
-      
       .duration(2000)
-      
       .attr("d", area_path_animate);
   }
 }

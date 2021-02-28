@@ -1,11 +1,10 @@
+import gVar from "../global var.js";
+
 var formatTime = d3.timeFormat("%e %B");
 class Daily_Cases_Bar {
-  constructor(element, data, height, width, margin) {
+  constructor(element, data) {
     this.element = element;
     this.data = data;
-    this.height = height;
-    this.width = width;
-    this.margin = margin;
 
     this.draw();
   }
@@ -16,9 +15,9 @@ class Daily_Cases_Bar {
     const chart = d3.select(this.element).append("svg");
 
     chart
-      .attr("width", this.width + this.margin.left + this.margin.right)
-      .attr("height", this.height + this.margin.top + this.margin.bottom)
-      .attr("viewBox", [0, 0, this.width, this.height])
+      .attr("width", gVar.width + gVar.margin.left + gVar.margin.right)
+      .attr("height", gVar.height + gVar.margin.top + gVar.margin.bottom)
+      .attr("viewBox", [0, 0, gVar.width, gVar.height])
       .classed("svg-container", true);
 
     this.plot = chart.append("g").attr("fill", "royalblue");
@@ -36,12 +35,12 @@ class Daily_Cases_Bar {
           return d.Date_YMD;
         })
       )
-      .range([this.margin.left, this.width - this.margin.right])
+      .range([gVar.margin.left, gVar.width - gVar.margin.right])
       .padding(0.1);
 
     this.x2Scale = d3
       .scaleTime()
-      .range([this.margin.left, this.width - this.margin.right])
+      .range([gVar.margin.left, gVar.width - gVar.margin.right])
       .domain(
         d3.extent(this.data, function (d) {
           return d.Date_YMD;
@@ -51,7 +50,7 @@ class Daily_Cases_Bar {
     this.yScale = d3
       .scaleLinear()
       .domain([0, d3.max(this.data, (d) => d.Confirmed) * 1.1])
-      .range([this.height - this.margin.bottom, this.margin.top]);
+      .range([gVar.height - gVar.margin.bottom, gVar.margin.top]);
   }
 
   drawBars() {
@@ -62,7 +61,7 @@ class Daily_Cases_Bar {
       .append("div")
       .attr("class", "tooltip")
       .style("opacity", 0);
-  
+
     visual
       .selectAll("rect")
       .data(this.data)
@@ -102,7 +101,6 @@ class Daily_Cases_Bar {
   }
 
   drawAxis() {
-    const m = this.margin;
     const yAxis = d3.axisLeft(this.yScale).ticks(null, this.data.format);
     // .attr("font-size", '20px')
 
@@ -111,11 +109,11 @@ class Daily_Cases_Bar {
 
     this.plot
       .append("g")
-      .attr("transform", `translate(${this.margin.left}, 0)`)
+      .attr("transform", `translate(${gVar.margin.left}, 0)`)
       .call(yAxis);
     this.plot
       .append("g")
-      .attr("transform", `translate(0,${this.height - this.margin.bottom})`)
+      .attr("transform", `translate(0,${gVar.height - gVar.margin.bottom})`)
       .call(xAxis);
   }
 }
