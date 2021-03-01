@@ -1,4 +1,4 @@
-import gVar, { formatDate } from "../global var.js";
+import gVar, { formatDate, formatValue } from "../global var.js";
 
 class Active_Case_Line {
   constructor(element, data) {
@@ -120,69 +120,74 @@ class Active_Case_Line {
       .attr("d", area_path_animate);
 
     // Tooltip Source: https://observablehq.com/@d3/line-chart-with-tooltip
-    const tooltip = visual.append("g");
+    const tooltip = this.plot.append("g");
 
-    visual.on("touchmove mousemove", function (event) {
-      const { Date_YMD, Active } = this.bisect(d3.pointer(event, this)[0]);
-
-      tooltip.attr("transform", `translate(${x(Date_YMD)},${y(Active)})`).call(
-        this.callout,
-        `${formatValue(Active)}
-          ${formatDate(Date_YMD)}`
-      );
+    const x_val = (x) => this.xScale(x);
+    const y_val = (y) => this.yScale(y);
+    visual.on("touchmove mousemove", function(event) {
+      const {date, value} = bisectFun(d3.pointer(event, this)[0]);
+      // console.log({date, value})
+      // console.log(this.yScale(500))
+      tooltip
+          .attr("transform", `translate(${x_val(date)},${y_val(value)})`)
+          // .attr("transform", 'translate(50,0)')
+          .call(callout, `${formatDate(date)}~${formatValue(parseInt(value))}`);
     });
+  
+    visual.on("touchend mouseleave", () => tooltip.call(callout, null));
 
-    visual.on("touchend mouseleave", () => tooltip.call(this.callout, null));
-  }
+    const bisectFun = (mx) => {
+      const bisect = d3.bisector((d) => d.Date_YMD).left;
+        const date = this.xScale.invert(mx);
+        const index = bisect(this.data, date, 1);
+        const a = this.data[index - 1];
+        const b = this.data[index];
+        return b && date - a.Date_YMD > b.Date_YMD - date ? {date: b.Date_YMD, value: b.Active} : {date: a.Date_YMD, value: a.Active};
+    }
 
-  callout = (g, value) => {
-    if (!value) return g.style("display", "none");
+    const callout = (g, value) => {
+      if (!value) return g.style("display", "none");
+  
+      g.style("display", null)
+        .style("pointer-events", "none")
+        .style("font", "10px sans-serif");
+  
+      const path = g
+        .selectAll("path")
+        .data([null])
+        .join("path")
+        .attr("fill", "white")
+        .attr("stroke", "black");
+  
+      const text = g
+        .selectAll("text")
+        .data([null])
+        .join("text")
 
-    g.style("display", null)
-      .style("pointer-events", "none")
-      .style("font", "10px sans-serif");
-
-    const path = g
-      .selectAll("path")
-      .data([null])
-      .join("path")
-      .attr("fill", "white")
-      .attr("stroke", "black");
-
-    const text = g
-      .selectAll("text")
-      .data([null])
-      .join("text")
-      .call((text) =>
-        text
-          .selectAll("tspan")
-          .data((value + "").split(/\n/))
-          .join("tspan")
-          .attr("x", 0)
-          .attr("y", (d, i) => `${i * 1.1}em`)
-          .style("font-weight", (_, i) => (i ? null : "bold"))
-          .text((d) => d)
+      const { x, y, width: w, height: h } = text.node().getBBox();
+      
+      text
+        .call((text) =>
+          text
+            .selectAll("tspan")
+            .data((value + "").split(/~/))
+            .join("tspan")
+            .attr("x", w/2)
+            .attr("y", (d, i) => `${i * 1.1}em`)
+            .attr("text-anchor", "middle")
+            .style("font-weight", (_, i) => (i ? null : "bold"))
+            .text((d) => d.trim())
+        );
+  
+  
+      text.attr("transform", `translate(${-w / 2},${15 - y})`);
+      path.attr(
+        "d",
+        `M${-w / 2 - 10},5H-5l5,-5l5,5H${w / 2 + 10}v${h + 20}h-${w + 20}z`
       );
-
-    const { x, y, width: w, height: h } = text.node().getBBox();
-
-    text.attr("transform", `translate(${-w / 2},${15 - y})`);
-    path.attr(
-      "d",
-      `M${-w / 2 - 10},5H-5l5,-5l5,5H${w / 2 + 10}v${h + 20}h-${w + 20}z`
-    );
-  };
-
-  bisect() {
-    const bisect = d3.bisector((d) => d.Date_YMD).left;
-    return (mx) => {
-      const date = this.xScale.invert(mx);
-      const index = bisect(this.data, date, 1);
-      const a = this.data[index - 1];
-      const b = this.data[index];
-      return b && date - a.date > b.date - date ? b : a;
     };
   }
+
 }
 
 export default Active_Case_Line;

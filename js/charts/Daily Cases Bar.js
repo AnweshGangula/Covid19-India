@@ -1,6 +1,6 @@
 import gVar from "../global var.js";
 
-var formatTime = d3.timeFormat("%e %B");
+var formatTime = d3.timeFormat("%d %B");
 class Daily_Cases_Bar {
   constructor(element, data) {
     this.element = element;

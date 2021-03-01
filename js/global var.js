@@ -13,5 +13,12 @@ function formatDate(date) {
   });
 }
 
+function formatValue(value) {
+  return value.toLocaleString("en", {
+    // style: "currency",
+    currency: "USD",
+  });
+}
+
 export default Global_Var;
-export { formatDate };
+export { formatDate, formatValue };

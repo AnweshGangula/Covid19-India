@@ -4,7 +4,7 @@
     min-width: 1200px;
 }
 
-div.tooltip {
+.tooltip {
     position: absolute;
     text-align: center;
     /* width: 60px; */
@@ -15,6 +15,7 @@ div.tooltip {
     border: 0px;
     border-radius: 8px;
     pointer-events: none;
+    white-space: nowrap;
     transform: translate(-50%, 0);
   }
 
