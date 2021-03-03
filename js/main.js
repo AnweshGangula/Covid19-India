@@ -1,6 +1,7 @@
 import Daily_Cases_Bar from "./charts/Daily Cases Bar.js";
 import Daily_Case_Line from "./charts/Daily Cases line.js";
 import Active_Case_Line from "./charts/Active Cases line.js";
+import Line_Chart from "./charts/Line Chart.js";
 
 // Parse the date / time
 var parseDate = d3.timeParse("%Y-%m-%d");
@@ -21,10 +22,39 @@ d3.csv("./Resources/state_wise_daily_Query.csv").then((All_data) => {
     return d["State Abbr"] === "_TT" /* && d.Actual < 500 */;
   });
 
-  // console.log(data[0].Date_YMD + " is of type " + typeof(data[0].Date_YMD));
-  // console.log(typeof(All_data[0].Confirmed));
+  var Cum_Confirmed = d3.cumsum(Total_data, (d) => d.Confirmed);
+  var Cum_Recovered = d3.cumsum(Total_data, (d) => d.Recovered);
+  var Cum_Deceased = d3.cumsum(Total_data, (d) => d.Deceased);
 
-  new Daily_Cases_Bar(newCases, Total_data);
-  new Active_Case_Line(activeCases, Total_data);
-  new Daily_Case_Line(dailyCasesLine, Total_data);
+  for (var i = 0; i < Total_data.length; i++) {
+    Total_data[i].Cum_Confirmed = Cum_Confirmed[i];
+    Total_data[i].Cum_Recovered = Cum_Recovered[i];
+    Total_data[i].Cum_Deceased = Cum_Deceased[i];
+  }
+
+  // console.log(Total_data.slice(0, 2));
+  // console.log(Total_data.map((a) => a.Cum_Recovered));
+  const line_dailyCases_list = {
+    Line1: { column: "Confirmed" },
+    Line2: { column: "Recovered" },
+  };
+  const line_dailyCases = new Line_Chart(
+    dailyCasesLine,
+    Total_data,
+    "Date_YMD",
+    line_dailyCases_list
+  );
+
+  const bar_dailyCases = new Daily_Cases_Bar(newCases, Total_data, {
+    xName: "Date_YMD",
+    yName: "Confirmed",
+  });
+
+  const line_activeCases = new Active_Case_Line(activeCases, Total_data);
+  const line_dailyCasesOld = new Daily_Case_Line(dailyCasesLine, Total_data);
+
+  bar_dailyCases.draw();
+  line_activeCases.draw();
+  line_dailyCasesOld.draw();
+  line_dailyCases.draw();
 });

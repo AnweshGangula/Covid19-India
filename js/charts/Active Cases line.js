@@ -5,8 +5,6 @@ class Active_Case_Line {
   constructor(element, data) {
     this.element = element;
     this.data = data;
-
-    this.draw();
   }
 
   draw() {
@@ -122,7 +120,7 @@ class Active_Case_Line {
       .attr("d", area_path_animate);
 
     // Tooltip Source: https://observablehq.com/@d3/line-chart-with-tooltip
-    const tooltip = this.plot.append("g").style("display", "none");
+    const tooltip = this.plot.append("g").style("transition", "200ms ease-out");
 
     const sleep = (milliseconds) => {
       return new Promise((resolve) => setTimeout(resolve, milliseconds));
@@ -130,32 +128,29 @@ class Active_Case_Line {
 
     //wait till line Animation is completed - source: https://stackoverflow.com/a/56974706/6908282
     sleep(duration).then(() => {
-      tooltip
-        .append("circle")
-        .attr("r", 4)
-        .attr("fill", "white")
-        .attr("stroke", "royalblue")
-        .attr("stroke-width", 2);
-
       const Xscale = this.xScale;
       const x_val = (x) => this.xScale(x);
       const y_val = (y) => this.yScale(y);
-      const all_data = this.data;;
+      const data = this.data;
       this.chart.on("touchmove mousemove", function (event) {
-        const { date, value } = bisectFun(d3.pointer(event, this)[0], Xscale, all_data);
-        // console.log({date, value})
-        // console.log(this.yScale(500))
+        const { date, value } = bisectFun(
+          d3.pointer(event, this)[0],
+          Xscale,
+          data
+        );
         tooltip
+          .style("opacity", 0.9)
           .attr("transform", `translate(${x_val(date)},${y_val(value)})`)
-          // .attr("transform", 'translate(50,0)')
           .call(callout, `${formatDate(date)}~${formatValue(parseInt(value))}`);
       });
 
-      this.chart.on("touchend mouseleave", () => tooltip.call(callout, null));
+      this.chart.on("touchend mouseleave", () =>
+        tooltip.style("opacity", 0).call(callout, null)
+      );
 
       // Below functions ( bisectFun, callout) can be moved to separate module(js file) if necessary
 
-      const bisectFun = (mx, XScale, data) => {
+      function bisectFun(mx, XScale, data) {
         const bisect = d3.bisector((d) => d.Date_YMD).left;
         const date = XScale.invert(mx);
         const index = bisect(data, date, 1);
@@ -164,14 +159,21 @@ class Active_Case_Line {
         return b && date - a.Date_YMD > b.Date_YMD - date
           ? { date: b.Date_YMD, value: b.Active }
           : { date: a.Date_YMD, value: a.Active };
-      };
+      }
 
-      const callout = (g, value) => {
-        if (!value) return g.style("display", "none");
+      function callout(g, value) {
+        if (!value) return g;
 
-        g.style("display", null)
-          .style("pointer-events", "none")
-          .style("font", "10px sans-serif");
+        g.style("pointer-events", "none").style("font", "10px sans-serif");
+
+        g.selectAll("circle")
+          .data([null])
+          .enter()
+          .append("circle")
+          .attr("r", 4)
+          .attr("fill", "white")
+          .attr("stroke", "royalblue")
+          .attr("stroke-width", 2);
 
         const path = g
           .selectAll("path")
@@ -199,15 +201,15 @@ class Active_Case_Line {
         );
 
         text.attr("transform", `translate(${-w / 2},${13 - y})`);
-        path.attr(
+        path
+          .attr(
             "d",
             `M${-w / 2 - 10},5H-5l5,-5l5,5H${w / 2 + 10}v${h + 10}h-${w + 20}z`
           )
           .attr("transform", `translate(0,3)`);
-      };
-    });;
+      }
+    });
   }
-  
 }
 
 export default Active_Case_Line;

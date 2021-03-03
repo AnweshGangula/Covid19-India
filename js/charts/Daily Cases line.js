@@ -4,8 +4,6 @@ class Daily_Case_Line {
   constructor(element, data) {
     this.element = element;
     this.data = data;
-
-    this.draw();
   }
 
   draw() {
@@ -59,7 +57,7 @@ class Daily_Case_Line {
       .append("g")
       .attr("transform", `translate(${gVar.margin.left}, 0)`)
       .call(d3.axisLeft(this.yScale))
-      .attr("class", "y-axis");;
+      .attr("class", "y-axis");
   }
 
   drawLines() {

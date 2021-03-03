@@ -2,11 +2,11 @@ import gVar from "../global var.js";
 
 var formatTime = d3.timeFormat("%d %B");
 class Daily_Cases_Bar {
-  constructor(element, data) {
+  constructor(element, data, { xName, yName }) {
     this.element = element;
     this.data = data;
-
-    this.draw();
+    this.xFunct = (d) => d[xName];
+    this.yFunct = (d) => d[yName];
   }
 
   draw() {
@@ -30,78 +30,19 @@ class Daily_Cases_Bar {
   createScales() {
     this.xScale = d3
       .scaleBand()
-      .domain(
-        this.data.map(function (d) {
-          return d.Date_YMD;
-        })
-      )
+      .domain(this.data.map((d) => this.xFunct(d)))
       .range([gVar.margin.left, gVar.width - gVar.margin.right])
       .padding(0.1);
 
     this.x2Scale = d3
       .scaleTime()
       .range([gVar.margin.left, gVar.width - gVar.margin.right])
-      .domain(
-        d3.extent(this.data, function (d) {
-          return d.Date_YMD;
-        })
-      );
+      .domain(d3.extent(this.data, (d) => this.xFunct(d)));
 
     this.yScale = d3
       .scaleLinear()
       .domain([0, d3.max(this.data, (d) => d.Confirmed) * 1.1])
       .range([gVar.height - gVar.margin.bottom, gVar.margin.top]);
-  }
-
-  drawBars() {
-    const visual = this.plot.append("g").attr("class", "chart");
-
-    visual
-      .selectAll("rect")
-      .data(this.data)
-      .join("rect")
-      .attr("x", (d) => this.xScale(d.Date_YMD))
-      .attr("title", (d) => d.Confirmed)
-      .attr("class", "rect")
-      .attr("width", this.xScale.bandwidth())
-      .attr("height", 0) // always equal to 0
-      .attr("y", (d) => this.yScale(0))
-      // .attr("y", (d) => y(d.TT))
-      // .attr("height", (d) => y(0) - y(d.TT));
-
-    // Tooltip
-    const tooltip_div = d3
-      .select(this.element)
-      .append("div")
-      .attr("class", "tooltip")
-      .style("opacity", 0);
-
-    visual
-      .selectAll("rect")
-      .on("touchmove mousemove", function (event, d) {
-        const no_cases = d.Confirmed.toLocaleString();
-        tooltip_div.transition().duration(200).style("opacity", 0.9);
-        tooltip_div
-          .html("<b>" + formatTime(d.Date_YMD) + "</b>" + "<br/>" + no_cases)
-          .style("left", event.pageX + "px")
-          .style("top", event.pageY - 38 + "px");
-      })
-      .on("touchend mouseleave", function (d) {
-        tooltip_div.transition().duration(500).style("opacity", 0);
-      });
-
-    // Animation
-    const dataLength = d3.selectAll(this.data).size();
-    this.plot
-      .selectAll("rect")
-      .transition()
-      .duration(1000)
-      .ease(d3.easeBackOut)
-      .attr("y", (d) => this.yScale(d.Confirmed))
-      .attr("height", (d) => this.yScale(0) - this.yScale(d.Confirmed))
-      .delay(function (d, i) {
-        return i * (dataLength / 60);
-      });
   }
 
   drawAxis() {
@@ -122,6 +63,60 @@ class Daily_Cases_Bar {
       .attr("transform", `translate(0,${gVar.height - gVar.margin.bottom})`)
       .attr("class", "y-axis")
       .call(xAxis);
+  }
+
+  drawBars() {
+    const visual = this.plot.append("g").attr("class", "chart");
+
+    visual
+      .selectAll("rect")
+      .data(this.data)
+      .join("rect")
+      .attr("x", (d) => this.xScale(this.xFunct(d)))
+      .attr("title", (d) => d.Confirmed)
+      .attr("class", "rect")
+      .attr("width", this.xScale.bandwidth())
+      .attr("height", 0) // always equal to 0
+      .attr("y", (d) => this.yScale(0));
+    // .attr("y", (d) => y(d.TT))
+    // .attr("height", (d) => y(0) - y(d.TT));
+
+    // Tooltip
+    const tooltip_div = d3
+      .select(this.element)
+      .append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0)
+      .style("transition", "200ms ease-out");
+
+    const yF = (d) => this.yFunct(d);
+    const xF = (d) => this.xFunct(d);
+    visual
+      .selectAll("rect")
+      .on("touchmove mousemove", function (event, d) {
+        const no_cases = yF(d).toLocaleString();
+        tooltip_div.transition().style("opacity", 0.9);
+        tooltip_div
+          .html("<b>" + formatTime(xF(d)) + "</b>" + "<br/>" + no_cases)
+          .style("left", event.pageX + "px")
+          .style("top", event.pageY - 38 + "px");
+      })
+      .on("touchend mouseleave", function (d) {
+        tooltip_div.transition().style("opacity", 0);
+      });
+
+    // Animation
+    const dataLength = d3.selectAll(this.data).size();
+    this.plot
+      .selectAll("rect")
+      .transition()
+      .duration(1000)
+      .ease(d3.easeBackOut)
+      .attr("y", (d) => this.yScale(this.yFunct(d)))
+      .attr("height", (d) => this.yScale(0) - this.yScale(this.yFunct(d)))
+      .delay(function (d, i) {
+        return i * (dataLength / 60);
+      });
   }
 }
 
