@@ -119,6 +119,10 @@ class Active_Case_Line {
       .duration(duration)
       .attr("d", area_path_animate);
 
+    this.tooltip();
+  }
+
+  tooltip() {
     // Tooltip Source: https://observablehq.com/@d3/line-chart-with-tooltip
     const tooltip = this.plot.append("g").style("transition", "200ms ease-out");
 
@@ -152,66 +156,65 @@ class Active_Case_Line {
         tooltip.style("opacity", 0).call(callout, null)
       );
     });
-
-    // Below functions ( bisectFun, callout) can be moved to separate module(js file) if necessary
-
-    function bisectFun(mx, xScale, data) {
-      const bisect = d3.bisector((d) => d.Date_YMD).left;
-      const date = xScale.invert(mx);
-      const i = bisect(data, date, 1);
-      const d0 = data[i - 1];
-      const d1 = data[i];
-      return date - d0.Date_YMD > d1.Date_YMD - date ? d1 : d0;
-    }
-
-    function callout(g, value) {
-      if (!value) return g;
-
-      g.style("pointer-events", "none").style("font", "10px sans-serif");
-
-      g.selectAll("circle")
-        .data([null])
-        .enter()
-        .append("circle")
-        .attr("r", 4)
-        .attr("fill", "white")
-        .attr("stroke", "royalblue")
-        .attr("stroke-width", 2);
-
-      const path = g
-        .selectAll("path")
-        .data([null])
-        .join("path")
-        .attr("fill", "white")
-        .attr("stroke", "black");
-
-      const text = g.selectAll("text").data([null]).join("text");
-
-      const { x, y, width: w, height: h } = text.node().getBBox();
-
-      text.call((text) =>
-        text
-          .selectAll("tspan")
-          .data((value + "").split(/~/))
-          .join("tspan")
-          .attr("x", w / 2)
-          .attr("y", (d, i) => `${i * 1.1}em`)
-          .attr("width", w)
-          .attr("height", h)
-          .attr("text-anchor", "middle")
-          .style("font-weight", (_, i) => (i ? null : "bold"))
-          .text((d) => d.trim())
-      );
-
-      text.attr("transform", `translate(${-w / 2},${13 - y})`);
-      path
-        .attr(
-          "d",
-          `M${-w / 2 - 10},5H-5l5,-5l5,5H${w / 2 + 10}v${h + 10}h-${w + 20}z`
-        )
-        .attr("transform", `translate(0,3)`);
-    }
   }
+}
+
+// Below functions ( bisectFun, callout) can be moved to separate module(js file) if necessary
+function bisectFun(mx, xScale, data) {
+  const bisect = d3.bisector((d) => d.Date_YMD).left;
+  const date = xScale.invert(mx);
+  const i = bisect(data, date, 1);
+  const d0 = data[i - 1];
+  const d1 = data[i];
+  return date - d0.Date_YMD > d1.Date_YMD - date ? d1 : d0;
+}
+
+function callout(g, value) {
+  if (!value) return g;
+
+  g.style("pointer-events", "none").style("font", "10px sans-serif");
+
+  g.selectAll("circle")
+    .data([null])
+    .enter()
+    .append("circle")
+    .attr("r", 4)
+    .attr("fill", "white")
+    .attr("stroke", "royalblue")
+    .attr("stroke-width", 2);
+
+  const path = g
+    .selectAll("path")
+    .data([null])
+    .join("path")
+    .attr("fill", "white")
+    .attr("stroke", "black");
+
+  const text = g.selectAll("text").data([null]).join("text");
+
+  const { x, y, width: w, height: h } = text.node().getBBox();
+
+  text.call((text) =>
+    text
+      .selectAll("tspan")
+      .data((value + "").split(/~/))
+      .join("tspan")
+      .attr("x", w / 2)
+      .attr("y", (d, i) => `${i * 1.1}em`)
+      .attr("width", w)
+      .attr("height", h)
+      .attr("text-anchor", "middle")
+      .style("font-weight", (_, i) => (i ? null : "bold"))
+      .text((d) => d.trim())
+  );
+
+  text.attr("transform", `translate(${-w / 2},${13 - y})`);
+  path
+    .attr(
+      "d",
+      `M${-w / 2 - 10},5H-5l5,-5l5,5H${w / 2 + 10}v${h + 10}h-${w + 20}z`
+    )
+    .attr("transform", `translate(0,3)`);
 }
 
 export default Active_Case_Line;

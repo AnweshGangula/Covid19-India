@@ -78,30 +78,6 @@ class Daily_Cases_Bar {
       .attr("height", 0) // always equal to 0
       .attr("y", (d) => this.yScale(0));
 
-    // Tooltip
-    const tooltip_div = d3
-      .select(this.element)
-      .append("div")
-      .attr("class", "tooltip")
-      .style("opacity", 0)
-      .style("transition", "200ms ease-out");
-
-    const yF = (d) => this.yFunct(d);
-    const xF = (d) => this.xFunct(d);
-    visual
-      .selectAll("rect")
-      .on("touchmove mousemove", function (event, d) {
-        const no_cases = yF(d).toLocaleString();
-        tooltip_div.transition().style("opacity", 0.9);
-        tooltip_div
-          .html("<b>" + formatTime(xF(d)) + "</b>" + "<br/>" + no_cases)
-          .style("left", event.pageX + "px")
-          .style("top", event.pageY - 38 + "px");
-      })
-      .on("touchend mouseleave", function (d) {
-        tooltip_div.transition().style("opacity", 0);
-      });
-
     // Animation
     const dataLength = d3.selectAll(this.data).size();
     this.plot
@@ -113,6 +89,33 @@ class Daily_Cases_Bar {
       .attr("height", (d) => this.yScale(0) - this.yScale(this.yFunct(d)))
       .delay(function (d, i) {
         return i * (dataLength / 60);
+      });
+
+    this.tooltip();
+  }
+
+  tooltip() {
+    const tooltip_div = d3
+      .select(this.element)
+      .append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0)
+      .style("transition", "200ms ease-out");
+
+    const yF = (d) => this.yFunct(d);
+    const xF = (d) => this.xFunct(d);
+    this.plot
+      .selectAll("rect")
+      .on("touchmove mousemove", function (event, d) {
+        const no_cases = yF(d).toLocaleString();
+        tooltip_div.transition().style("opacity", 0.9);
+        tooltip_div
+          .html("<b>" + formatTime(xF(d)) + "</b>" + "<br/>" + no_cases)
+          .style("left", event.pageX + "px")
+          .style("top", event.pageY - 38 + "px");
+      })
+      .on("touchend mouseleave", function (d) {
+        tooltip_div.transition().style("opacity", 0);
       });
   }
 }
