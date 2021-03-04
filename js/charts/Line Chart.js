@@ -1,4 +1,9 @@
-import gVar from "../global var.js";
+import gVar, {
+  formatDate,
+  formatValue,
+  duration,
+  color,
+} from "../global var.js";
 
 // Reference: http://bl.ocks.org/asielen/44ffca2877d0132572cb
 class Line_Chart {
@@ -23,23 +28,21 @@ class Line_Chart {
     }
 
     function getYFn(column) {
-      return function (d) {
-        return d[column];
-      };
+      return (d) => d[column];
     }
   }
 
   draw() {
     // Adds the svg canvas
-    const chart = d3.select(this.element).append("svg");
+    this.chart = d3.select(this.element).append("svg");
 
-    chart
+    this.chart
       .attr("width", gVar.width + gVar.margin.left + gVar.margin.right)
       .attr("height", gVar.height + gVar.margin.top + gVar.margin.bottom)
       .attr("viewBox", [0, 0, gVar.width, gVar.height])
       .classed("svg-container", true);
 
-    this.plot = chart.append("g").attr("fill", "royalblue");
+    this.plot = this.chart.append("g").attr("fill", "royalblue");
 
     this.createScales();
     this.drawAxis();
@@ -79,20 +82,14 @@ class Line_Chart {
 
   drawLines() {
     const visual = this.plot.append("g").attr("class", "chart");
-    const color = d3.scaleOrdinal(d3.schemeSet1);
 
-    // Build line building functions
-    const yS = this.yScale;
-    const yObs = this.yObjs;
-    function getYScaleFn(yObj) {
-      return (d) => yS(yObs[yObj].yFunct(d));
-    }
+    // Build line start functions
     for (var yObj in this.yObjs) {
       const index = Object.keys(this.yObjs).indexOf(yObj);
-      this.yObjs[yObj].line = d3
+      this.yObjs[yObj].line_start = d3
         .line()
         .x((d) => this.xScale(this.xFunct(d)))
-        .y(getYScaleFn(yObj))
+        .y(this.yScale(0))
         .curve(index % 2 == 0 ? d3.curveNatural : d3.curveCatmullRom); // alternatively switch between d3.curveNatural & d3.curveCatmullRom
     }
 
@@ -102,16 +99,141 @@ class Line_Chart {
         .append("path")
         .datum(this.data)
         .attr("class", "line")
-        .attr("d", this.yObjs[y].line)
+        .attr("d", this.yObjs[y].line_start)
         .style("stroke", color(y))
         .attr("data-series", y)
         .attr("fill", "none")
-        .attr("stroke-width", 4)
+        .attr("stroke-width", 3)
         .attr("stroke", "#491EC4");
     }
 
+    this.animate();
+    this.tooltip();
+  }
+
+  animate() {
+    // Build line end functions
+    const yS = this.yScale;
+    const yObs = this.yObjs;
+    function getYScaleFn(yObj) {
+      return (d) => yS(yObs[yObj].yFunct(d));
+    }
+    for (var yObj in this.yObjs) {
+      const index = Object.keys(this.yObjs).indexOf(yObj);
+      this.yObjs[yObj].line_end = d3
+        .line()
+        .x((d) => this.xScale(this.xFunct(d)))
+        .y(getYScaleFn(yObj))
+        .curve(index % 2 == 0 ? d3.curveNatural : d3.curveCatmullRom); // alternatively switch between d3.curveNatural & d3.curveCatmullRom
+    }
+
+    // Animate Lines
     for (var y in this.yObjs) {
-      this.yObjs[y].path.attr("d", this.yObjs[y].line);
+      this.yObjs[y].path
+        .transition()
+        .ease(d3.easeBackOut)
+        .duration(duration)
+        .attr("d", this.yObjs[y].line_end);
+    }
+  }
+
+  tooltip() {
+    // Tooltip Source: http://bl.ocks.org/asielen/44ffca2877d0132572cb
+    const tooltips = this.plot
+      .append("g")
+      .attr("class", "tooltips")
+      .style("opacity", 0)
+      .style("transition", "200ms ease-out");
+
+    for (var y in this.yObjs) {
+      console.log(color(y));
+      this.yObjs[y].tooltip = tooltips.append("g");
+      this.yObjs[y].tooltip
+        .append("circle")
+        .attr("r", 5)
+        .style("fill", "white")
+        .style("stroke", color(y))
+        .style("stroke-width", 2);
+      this.yObjs[y].tooltip
+        .append("rect")
+        .attr("x", 8)
+        .attr("y", -8)
+        .attr("rx", 3)
+        .attr("ry", 3)
+        .attr("width", 50)
+        .attr("height", "1.2em")
+        .style("fill", color(y));
+      this.yObjs[y].tooltip
+        .append("text")
+        .attr("x", 10)
+        .attr("dy", ".35em")
+        .style("fill", "white");
+    }
+
+    // Year label
+    tooltips.append("text").attr("class", "tooltips year");
+    // .attr("x", 20)
+    // .attr("y", 0);
+
+    // Tooltip line
+    tooltips
+      .append("line")
+      .attr("class", "tooltips line")
+      .attr("y1", 0)
+      .attr("y2", gVar.height - gVar.margin.top - gVar.margin.bottom);
+
+    const sleep = (milliseconds) => {
+      return new Promise((resolve) => setTimeout(resolve, milliseconds));
+    };
+
+    //wait till line Animation is completed - source: https://stackoverflow.com/a/56974706/6908282
+    sleep(duration).then(() => {
+      const xSc = this.xScale;
+      const data = this.data;
+      this.chart.on("touchmove mousemove", function (event) {
+        tooltips.style("opacity", 0.9);
+        mousemove(xSc, data, this.yObjs);
+      });
+
+      this.chart.on("touchend mouseleave", () => tooltips.style("opacity", 0));
+    });
+
+    const xSc = this.xScale;
+    const xFun = this.xFunct;
+    const ySc = this.yScale;
+    const yFun = this.yFunct;
+    const yData = this.yObjs;
+
+    function mousemove(xScale, data) {
+      const bisect = d3.bisector(xFun).left;
+      var x0 = xScale.invert(d3.pointer(event, this)[0]),
+        i = bisect(data, x0, 1),
+        d0 = data[i - 1],
+        d1 = data[i];
+      // error at this line
+      var d = x0 - xFun(d0) > xFun(d1) - x0 ? d1 : d0;
+
+      var minY = gVar.height - gVar.margin.top - gVar.margin.bottom;
+      for (var y in yData) {
+        yData[y].tooltip.attr(
+          "transform",
+          `translate(${xSc(xFun(d))},${ySc(yData[y].yFunct(d))})`
+        );
+        yData[y].tooltip
+          .select("text")
+          .text(formatValue(parseInt(yData[y].yFunct(d))));
+        minY = Math.min(minY, ySc(yData[y].yFunct(d)));
+      }
+
+      tooltips
+        .select(".tooltips .line")
+        .attr("transform", `translate(${xSc(xFun(d))})`)
+        .attr("y1", "0.5em");
+      tooltips
+        .select(".tooltips .year")
+        .text(formatDate(xFun(d)))
+        .attr("transform", `translate(${xSc(xFun(d)) - 5})`)
+        .attr("text-anchor", "middle");
     }
   }
 }

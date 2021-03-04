@@ -1,6 +1,5 @@
-import gVar, { formatDate, formatValue } from "../global var.js";
+import gVar, { formatDate, formatValue, duration } from "../global var.js";
 
-const duration = 2000;
 class Active_Case_Line {
   constructor(element, data) {
     this.element = element;
@@ -10,16 +9,15 @@ class Active_Case_Line {
   draw() {
     // this.element.innerHTML = "";
     // Adds the svg canvas
-    const chart = d3
-      .select(this.element)
-      .append("svg")
+    this.chart = d3.select(this.element).append("svg");
+
+    this.chart
       .attr("width", gVar.width + gVar.margin.left + gVar.margin.right)
       .attr("height", gVar.height + gVar.margin.top + gVar.margin.bottom)
       .attr("viewBox", [0, 0, gVar.width, gVar.height])
       .classed("svg-container", true);
 
-    this.plot = chart.append("g").attr("fill", "royalblue");
-    this.chart = chart;
+    this.plot = this.chart.append("g").attr("fill", "royalblue");
 
     this.createScales();
     this.drawAxis();
@@ -138,7 +136,7 @@ class Active_Case_Line {
       const y_val = (y) => this.yScale(y);
       const data = this.data;
       this.chart.on("touchmove mousemove", function (event) {
-        const bData = bisectFun(d3.pointer(event, this)[0], Xscale, data);
+        const bData = bisectFun(Xscale, data);
         tooltip
           .style("opacity", 0.9)
           .attr(
@@ -161,10 +159,11 @@ class Active_Case_Line {
 }
 
 // Below functions ( bisectFun, callout) can be moved to separate module(js file) if necessary
-function bisectFun(mx, xScale, data) {
+function bisectFun(xScale, data) {
   const bisect = d3.bisector((d) => d.Date_YMD).left;
-  const date = xScale.invert(mx);
+  const date = xScale.invert(d3.pointer(event, this)[0]);
   const i = bisect(data, date, 1);
+  // console.log(i);
   const d0 = data[i - 1];
   const d1 = data[i];
   return date - d0.Date_YMD > d1.Date_YMD - date ? d1 : d0;

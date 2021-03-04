@@ -4,6 +4,9 @@ var Global_Var = {
   height: 300,
 };
 
+const duration = 2000;
+const color = d3.scaleOrdinal(d3.schemeSet1);
+
 function formatDate(date) {
   return date.toLocaleString("en", {
     month: "short",
@@ -21,4 +24,4 @@ function formatValue(value) {
 }
 
 export default Global_Var;
-export { formatDate, formatValue };
+export { formatDate, formatValue, duration, color };
