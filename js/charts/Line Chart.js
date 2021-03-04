@@ -88,11 +88,12 @@ class Line_Chart {
       return (d) => yS(yObs[yObj].yFunct(d));
     }
     for (var yObj in this.yObjs) {
+      const index = Object.keys(this.yObjs).indexOf(yObj);
       this.yObjs[yObj].line = d3
         .line()
         .x((d) => this.xScale(this.xFunct(d)))
         .y(getYScaleFn(yObj))
-        .curve(d3.curveNatural);
+        .curve(index % 2 == 0 ? d3.curveNatural : d3.curveCatmullRom); // alternatively switch between d3.curveNatural & d3.curveCatmullRom
     }
 
     // Draw Lines

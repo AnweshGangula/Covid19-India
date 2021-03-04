@@ -67,7 +67,7 @@ class Daily_Case_Line {
       .line()
       .x((d) => this.xScale(d.Date_YMD))
       .y((d) => this.yScale(d.Confirmed))
-      .curve(d3.curveNatural); //curves the line
+      .curve(d3.curveCatmullRom); //curves the line
 
     // define the 2nd line
     const valueline2 = d3

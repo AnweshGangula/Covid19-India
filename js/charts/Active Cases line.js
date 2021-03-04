@@ -65,14 +65,6 @@ class Active_Case_Line {
       .line()
       .x((d) => this.xScale(d.Date_YMD))
       .y((d) => this.yScale(0))
-      .curve(d3.curveNatural);
-    //curves the line
-
-    // define the 1st line
-    const valueline_animate = d3
-      .line()
-      .x((d) => this.xScale(d.Date_YMD))
-      .y((d) => this.yScale(d.Active))
       .curve(d3.curveNatural); //curves the line
 
     const area_path_start = d3
@@ -81,13 +73,7 @@ class Active_Case_Line {
       .y0(this.yScale(0))
       .y1(this.yScale(0));
 
-    const area_path_animate = d3
-      .area()
-      .x((d) => this.xScale(d.Date_YMD))
-      .y0(this.yScale(0))
-      .y1((d) => this.yScale(d.Active));
-
-    const path = visual
+    this.path = visual
       .append("path")
       .data([this.data])
       .attr("class", "line")
@@ -99,27 +85,42 @@ class Active_Case_Line {
     //   .attr("fill", "#cce5df")
     //   .attr("d", area);
 
-    const area = visual
+    this.area = visual
       .append("path")
       .data([this.data])
       .attr("fill", "#cce5df")
       .attr("d", area_path_start);
 
-    // Animation
+    this.animate();
+    this.tooltip();
+  }
+
+  animate() {
     // Reference link: https://observablehq.com/@onoratod/animate-a-path-in-d3
-    path
+
+    const valueline_animate = d3
+      .line()
+      .x((d) => this.xScale(d.Date_YMD))
+      .y((d) => this.yScale(d.Active))
+      .curve(d3.curveNatural); //curves the line
+
+    const area_path_animate = d3
+      .area()
+      .x((d) => this.xScale(d.Date_YMD))
+      .y0(this.yScale(0))
+      .y1((d) => this.yScale(d.Active));
+
+    this.path
       .transition()
       .ease(d3.easeBackOut)
       .duration(duration)
       .attr("d", valueline_animate);
 
-    area
+    this.area
       .transition()
       .ease(d3.easeBackOut)
       .duration(duration)
       .attr("d", area_path_animate);
-
-    this.tooltip();
   }
 
   tooltip() {
@@ -200,7 +201,7 @@ function callout(g, value) {
       .data((value + "").split(/~/))
       .join("tspan")
       .attr("x", w / 2)
-      .attr("y", (d, i) => `${i * 1.1}em`)
+      .attr("y", (d, i) => `${i * 1.3}em`)
       .attr("width", w)
       .attr("height", h)
       .attr("text-anchor", "middle")
@@ -209,12 +210,33 @@ function callout(g, value) {
   );
 
   text.attr("transform", `translate(${-w / 2},${13 - y})`);
-  path
-    .attr(
-      "d",
-      `M${-w / 2 - 10},5H-5l5,-5l5,5H${w / 2 + 10}v${h + 10}h-${w + 20}z`
-    )
-    .attr("transform", `translate(0,3)`);
+  const Props = { pad: 10, bzr: 3 };
+  const length = w + Props.pad * 2;
+  const height = h + Props.pad * 1.5;
+
+  const tooltipPath_old = `M${-length / 2}, 5H-5l5,-5l5, 5H${
+    length / 2
+  }v${height}h-${length}z`;
+
+  const tooltipPath = `M -${length / 2} ${5 + Props.bzr} Q -${length / 2} 5 -${
+    length / 2 - Props.bzr
+  } 5 H -5 l 5 -5 l 5 5 H ${length / 2 - Props.bzr} Q ${length / 2} 5 ${
+    length / 2
+  } ${5 + Props.bzr} v ${height - 5 - Props.bzr - 1} Q ${
+    length / 2
+  } ${height} ${length / 2 - 1} ${height} h -${length - 3} Q -${
+    length / 2
+  } ${height} -${length / 2} ${height - 1} z`;
+
+  const tooltipPath_small = `M -${length / 2} ${5 + Props.bzr} Q -${
+    length / 2
+  } 5 -${length / 2 - Props.bzr} 5 H -5 l 5 -5 l 5 5 H ${
+    length / 2 - Props.bzr
+  } Q ${length / 2} 5 ${length / 2} ${5 + Props.bzr} v${
+    height - 5
+  }h-${length}z`;
+
+  path.attr("d", tooltipPath).attr("transform", `translate(0,3)`);
 }
 
 export default Active_Case_Line;

@@ -78,7 +78,11 @@ class Daily_Cases_Bar {
       .attr("height", 0) // always equal to 0
       .attr("y", (d) => this.yScale(0));
 
-    // Animation
+    this.animate();
+    this.tooltip();
+  }
+
+  animate() {
     const dataLength = d3.selectAll(this.data).size();
     this.plot
       .selectAll("rect")
@@ -87,11 +91,7 @@ class Daily_Cases_Bar {
       .ease(d3.easeBackOut)
       .attr("y", (d) => this.yScale(this.yFunct(d)))
       .attr("height", (d) => this.yScale(0) - this.yScale(this.yFunct(d)))
-      .delay(function (d, i) {
-        return i * (dataLength / 60);
-      });
-
-    this.tooltip();
+      .delay((d, i) => i * (dataLength / 60));
   }
 
   tooltip() {
