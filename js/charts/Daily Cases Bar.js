@@ -10,7 +10,6 @@ class Daily_Cases_Bar {
   }
 
   draw() {
-    // this.element.innerHTML = "";
     // Adds the svg canvas
     const chart = d3.select(this.element).append("svg");
 
@@ -78,8 +77,6 @@ class Daily_Cases_Bar {
       .attr("width", this.xScale.bandwidth())
       .attr("height", 0) // always equal to 0
       .attr("y", (d) => this.yScale(0));
-    // .attr("y", (d) => y(d.TT))
-    // .attr("height", (d) => y(0) - y(d.TT));
 
     // Tooltip
     const tooltip_div = d3

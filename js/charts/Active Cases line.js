@@ -133,82 +133,84 @@ class Active_Case_Line {
       const y_val = (y) => this.yScale(y);
       const data = this.data;
       this.chart.on("touchmove mousemove", function (event) {
-        const { date, value } = bisectFun(
-          d3.pointer(event, this)[0],
-          Xscale,
-          data
-        );
+        const bData = bisectFun(d3.pointer(event, this)[0], Xscale, data);
         tooltip
           .style("opacity", 0.9)
-          .attr("transform", `translate(${x_val(date)},${y_val(value)})`)
-          .call(callout, `${formatDate(date)}~${formatValue(parseInt(value))}`);
+          .attr(
+            "transform",
+            `translate(${x_val(bData.Date_YMD)},${y_val(bData.Active)})`
+          )
+          .call(
+            callout,
+            `${formatDate(bData.Date_YMD)}~${formatValue(
+              parseInt(bData.Active)
+            )}`
+          );
       });
 
       this.chart.on("touchend mouseleave", () =>
         tooltip.style("opacity", 0).call(callout, null)
       );
-
-      // Below functions ( bisectFun, callout) can be moved to separate module(js file) if necessary
-
-      function bisectFun(mx, XScale, data) {
-        const bisect = d3.bisector((d) => d.Date_YMD).left;
-        const date = XScale.invert(mx);
-        const index = bisect(data, date, 1);
-        const a = data[index - 1];
-        const b = data[index];
-        return b && date - a.Date_YMD > b.Date_YMD - date
-          ? { date: b.Date_YMD, value: b.Active }
-          : { date: a.Date_YMD, value: a.Active };
-      }
-
-      function callout(g, value) {
-        if (!value) return g;
-
-        g.style("pointer-events", "none").style("font", "10px sans-serif");
-
-        g.selectAll("circle")
-          .data([null])
-          .enter()
-          .append("circle")
-          .attr("r", 4)
-          .attr("fill", "white")
-          .attr("stroke", "royalblue")
-          .attr("stroke-width", 2);
-
-        const path = g
-          .selectAll("path")
-          .data([null])
-          .join("path")
-          .attr("fill", "white")
-          .attr("stroke", "black");
-
-        const text = g.selectAll("text").data([null]).join("text");
-
-        const { x, y, width: w, height: h } = text.node().getBBox();
-
-        text.call((text) =>
-          text
-            .selectAll("tspan")
-            .data((value + "").split(/~/))
-            .join("tspan")
-            .attr("x", w / 2)
-            .attr("y", (d, i) => `${i * 1.1}em`)
-            .attr("width", w)
-            .attr("height", h)
-            .attr("text-anchor", "middle")
-            .style("font-weight", (_, i) => (i ? null : "bold"))
-            .text((d) => d.trim())
-        );
-
-        text.attr("transform", `translate(${-w / 2},${13 - y})`);
-        path
-          .attr(
-            "d",
-            `M${-w / 2 - 10},5H-5l5,-5l5,5H${w / 2 + 10}v${h + 10}h-${w + 20}z`
-          )
-          .attr("transform", `translate(0,3)`);
-      }
     });
+
+    // Below functions ( bisectFun, callout) can be moved to separate module(js file) if necessary
+
+    function bisectFun(mx, xScale, data) {
+      const bisect = d3.bisector((d) => d.Date_YMD).left;
+      const date = xScale.invert(mx);
+      const i = bisect(data, date, 1);
+      const d0 = data[i - 1];
+      const d1 = data[i];
+      return date - d0.Date_YMD > d1.Date_YMD - date ? d1 : d0;
+    }
+
+    function callout(g, value) {
+      if (!value) return g;
+
+      g.style("pointer-events", "none").style("font", "10px sans-serif");
+
+      g.selectAll("circle")
+        .data([null])
+        .enter()
+        .append("circle")
+        .attr("r", 4)
+        .attr("fill", "white")
+        .attr("stroke", "royalblue")
+        .attr("stroke-width", 2);
+
+      const path = g
+        .selectAll("path")
+        .data([null])
+        .join("path")
+        .attr("fill", "white")
+        .attr("stroke", "black");
+
+      const text = g.selectAll("text").data([null]).join("text");
+
+      const { x, y, width: w, height: h } = text.node().getBBox();
+
+      text.call((text) =>
+        text
+          .selectAll("tspan")
+          .data((value + "").split(/~/))
+          .join("tspan")
+          .attr("x", w / 2)
+          .attr("y", (d, i) => `${i * 1.1}em`)
+          .attr("width", w)
+          .attr("height", h)
+          .attr("text-anchor", "middle")
+          .style("font-weight", (_, i) => (i ? null : "bold"))
+          .text((d) => d.trim())
+      );
+
+      text.attr("transform", `translate(${-w / 2},${13 - y})`);
+      path
+        .attr(
+          "d",
+          `M${-w / 2 - 10},5H-5l5,-5l5,5H${w / 2 + 10}v${h + 10}h-${w + 20}z`
+        )
+        .attr("transform", `translate(0,3)`);
+    }
   }
 }
 

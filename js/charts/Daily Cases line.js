@@ -7,7 +7,6 @@ class Daily_Case_Line {
   }
 
   draw() {
-    // this.element.innerHTML = "";
     // Adds the svg canvas
     const chart = d3.select(this.element).append("svg");
 
@@ -74,7 +73,6 @@ class Daily_Case_Line {
     const valueline2 = d3
       .line()
       .x((d) => this.xScale(d.Date_YMD))
-      // .y(function(d) { return y(d['DL - Delhi']); });
       .y((d) => this.yScale(d.Recovered))
       .curve(d3.curveNatural); //curves the line
 
