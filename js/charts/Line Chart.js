@@ -7,11 +7,12 @@ import gVar, {
 
 // Reference: http://bl.ocks.org/asielen/44ffca2877d0132572cb
 class Line_Chart {
-  constructor(element, data, xName, yObjs) {
+  constructor(element, data, xName, yObjs, area = true) {
     this.element = element;
     this.data = data;
     this.yObjs = yObjs;
     this.xFunct = (d) => d[xName];
+    this.area = area
 
     /*
     yObjs format:
@@ -81,7 +82,7 @@ class Line_Chart {
   }
 
   drawLines() {
-    const visual = this.plot.append("g").attr("class", "chart");
+    this.visual = this.plot.append("g").attr("class", "chart");
 
     // Build line start functions
     for (var yObj in this.yObjs) {
@@ -95,7 +96,7 @@ class Line_Chart {
 
     // Draw Lines
     for (var y in this.yObjs) {
-      this.yObjs[y].path = visual
+      this.yObjs[y].path = this.visual
         .append("path")
         .datum(this.data)
         .attr("class", "line")
@@ -105,6 +106,34 @@ class Line_Chart {
         .attr("fill", "none")
         .attr("stroke-width", 3)
         .attr("stroke", "#491EC4");
+    }
+
+    //Build area start functions
+    for (var yObj in this.yObjs) {
+      const index = Object.keys(this.yObjs).indexOf(yObj);
+      this.yObjs[yObj].area_start = d3
+        .area()
+        .x((d) => this.xScale(this.xFunct(d)))
+        .y0(this.yScale(0))
+        .y1(this.yScale(0))
+        .curve(index % 2 == 0 ? d3.curveNatural : d3.curveCatmullRom); // alternatively switch between d3.curveNatural & d3.curveCatmullRom
+    }
+
+    //Draw Areas
+    if (this.area == true) {
+      for (var y in this.yObjs) {
+        this.yObjs[y].area = this.visual
+          .append("path")
+          .datum(this.data)
+          .attr("class", "area")
+          .attr("fill", color(y))
+          .attr("d", this.yObjs[y].line_start)
+        // .style("stroke", color(y))
+        // .attr("data-series", y)
+        // .attr("fill", "none")
+        // .attr("stroke-width", 3)
+        // .attr("stroke", "#491EC4");
+      }
     }
 
     this.animate();
@@ -134,6 +163,23 @@ class Line_Chart {
         .ease(d3.easeBackOut)
         .duration(duration)
         .attr("d", this.yObjs[y].line_end);
+
+      if (this.area == true) {
+        for (var yObj in this.yObjs) {
+          const index = Object.keys(this.yObjs).indexOf(yObj);
+          this.yObjs[yObj].area_end = d3
+            .area()
+            .x((d) => this.xScale(this.xFunct(d)))
+            .y0(this.yScale(0))
+            .y1(getYScaleFn(yObj))
+            .curve(index % 2 == 0 ? d3.curveNatural : d3.curveCatmullRom); // alternatively switch between d3.curveNatural & d3.curveCatmullRom
+        }
+        this.yObjs[y].area
+          .transition()
+          .ease(d3.easeBackOut)
+          .duration(duration)
+          .attr("d", this.yObjs[y].area_end);
+      }
     }
   }
 
@@ -146,23 +192,23 @@ class Line_Chart {
       .style("transition", "200ms ease-out");
 
     for (var y in this.yObjs) {
-      console.log(color(y));
-      this.yObjs[y].tooltip = tooltips.append("g");
+      this.yObjs[y].tooltip = tooltips.append("g").attr("class", this.yObjs[y].column);
       this.yObjs[y].tooltip
         .append("circle")
         .attr("r", 5)
         .style("fill", "white")
         .style("stroke", color(y))
         .style("stroke-width", 2);
+
       this.yObjs[y].tooltip
         .append("rect")
         .attr("x", 8)
         .attr("y", -8)
         .attr("rx", 3)
         .attr("ry", 3)
-        .attr("width", 50)
         .attr("height", "1.2em")
         .style("fill", color(y));
+
       this.yObjs[y].tooltip
         .append("text")
         .attr("x", 10)
@@ -223,6 +269,14 @@ class Line_Chart {
           .select("text")
           .text(formatValue(parseInt(yData[y].yFunct(d))));
         minY = Math.min(minY, ySc(yData[y].yFunct(d)));
+
+        // Update the text background rectangle size
+        const text = yData[y].tooltip.select("text")
+        const { xpos, ypos, width: w, height: h } = text.node().getBBox();
+        yData[y].tooltip
+          .selectAll("rect")
+          .data([null]).join("text")
+          .attr("width", parseInt(w) + 5)
       }
 
       tooltips

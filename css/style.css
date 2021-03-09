@@ -41,3 +41,7 @@ rect.rect:hover {
 g.tooltips > * {
   transition: 200ms ease-out;
 }
+
+path.area {
+  opacity: 0.1;
+}
