@@ -191,6 +191,18 @@ class Line_Chart {
       .style("opacity", 0)
       .style("transition", "200ms ease-out");
 
+    // Tooltip line
+    tooltips
+      .append("line")
+      .attr("class", "tooltips line")
+      .attr("y1", 0)
+      .attr("y2", gVar.height - gVar.margin.bottom);
+
+    // Year label
+    tooltips.append("text").attr("class", "tooltips year");
+    // .attr("x", 20)
+    // .attr("y", 0);
+
     for (var y in this.yObjs) {
       this.yObjs[y].tooltip = tooltips.append("g").attr("class", this.yObjs[y].column);
       this.yObjs[y].tooltip
@@ -215,18 +227,6 @@ class Line_Chart {
         .attr("dy", ".35em")
         .style("fill", "white");
     }
-
-    // Year label
-    tooltips.append("text").attr("class", "tooltips year");
-    // .attr("x", 20)
-    // .attr("y", 0);
-
-    // Tooltip line
-    tooltips
-      .append("line")
-      .attr("class", "tooltips line")
-      .attr("y1", 0)
-      .attr("y2", gVar.height - gVar.margin.top - gVar.margin.bottom);
 
     const sleep = (milliseconds) => {
       return new Promise((resolve) => setTimeout(resolve, milliseconds));
