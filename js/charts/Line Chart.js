@@ -34,6 +34,7 @@ class Line_Chart {
   }
 
   draw() {
+    this.legend();
     // Adds the svg canvas
     this.chart = d3.select(this.element).append("svg");
 
@@ -104,7 +105,7 @@ class Line_Chart {
         .style("stroke", color(y))
         .attr("data-series", y)
         .attr("fill", "none")
-        .attr("stroke-width", 3)
+        .attr("stroke-width", 2)
         .attr("stroke", "#491EC4");
     }
 
@@ -288,6 +289,17 @@ class Line_Chart {
         .text(formatDate(xFun(d)))
         .attr("transform", `translate(${xSc(xFun(d)) - 5})`)
         .attr("text-anchor", "middle");
+    }
+  }
+
+  legend() {
+    //Draw legend
+    var legend = d3.select(this.element).append("div").attr("class", "line-legend").style("margin-left", `${gVar.margin.left + 10}px`);
+    for (var y in this.yObjs) {
+      let series = legend.append('div').style("display", "flex").style("align-items", "baseline");
+      series.append('div').attr("class", "series-marker").style("background-color", color(y));
+      series.append('p').text(this.yObjs[y].column);
+      this.yObjs[y].legend = series;
     }
   }
 }

@@ -45,3 +45,16 @@ g.tooltips > * {
 path.area {
   opacity: 0.1;
 }
+.line-legend {
+  display: flex;
+}
+
+.line-legend * {
+  margin-right: 10px;
+}
+
+#d3line .series-marker {
+  width: 10px;
+  height: 10px;
+  margin: 0 5px;
+}

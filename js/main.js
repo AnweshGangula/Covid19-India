@@ -34,9 +34,12 @@ d3.csv("./Resources/state_wise_daily_Query.csv").then((All_data) => {
 
   // console.log(Total_data.slice(0, 2));
   // console.log(Total_data.map((a) => a.Cum_Recovered));
+
+  // Draw D3 Charts
   const line_dailyCases_list = {
-    Line1: { column: "Cum_Recovered" },
-    Line2: { column: "Cum_Confirmed" },
+    Line1: { column: "Cum_Confirmed" },
+    Line2: { column: "Cum_Deceased" },
+    Line3: { column: "Cum_Recovered" },
   };
   const line_dailyCases = new Line_Chart(
     dailyCasesLine,
@@ -51,10 +54,10 @@ d3.csv("./Resources/state_wise_daily_Query.csv").then((All_data) => {
   });
 
   const line_activeCases = new Active_Case_Line(activeCases, Total_data);
-  const line_dailyCasesOld = new Daily_Case_Line(dailyCasesLine, Total_data);
+  // const line_dailyCasesOld = new Daily_Case_Line(dailyCasesLine, Total_data);
 
   bar_dailyCases.draw();
   line_activeCases.draw();
-  line_dailyCasesOld.draw();
+  // line_dailyCasesOld.draw();
   line_dailyCases.draw();
 });
