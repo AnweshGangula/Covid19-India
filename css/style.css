@@ -58,3 +58,13 @@ path.area {
   height: 10px;
   margin: 0 5px;
 }
+
+path.state {
+  fill: #ccc;
+  stroke: #fff;
+  stroke-width: 0.5px;
+}
+
+path.state:hover {
+  fill: red;
+}

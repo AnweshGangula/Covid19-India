@@ -32,6 +32,19 @@ d3.csv("./Resources/state_wise_daily_Query.csv").then((All_data) => {
     Total_data[i].Cum_Deceased = Cum_Deceased[i];
   }
 
+  let dates = [];
+  for (let i of Total_data) {
+    dates.push(i.Date_YMD);
+  }
+
+  let dateRange = d3.extent(dates);
+  let minDate = dateRange[0];
+  let maxDate = dateRange[1];
+
+  var Current_Data = All_data.filter((d) => {
+    return Date.parse(d.Date_YMD) === Date.parse(maxDate);
+  });
+
   // console.log(Total_data.slice(0, 2));
   // console.log(Total_data.map((a) => a.Cum_Recovered));
 
