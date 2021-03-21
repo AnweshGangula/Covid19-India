@@ -2,6 +2,7 @@ import Daily_Cases_Bar from "./charts/Daily Cases Bar.js";
 import Daily_Case_Line from "./charts/Daily Cases line.js";
 import Active_Case_Line from "./charts/Active Cases line.js";
 import Line_Chart from "./charts/Line Chart.js";
+import Map from "./charts/Map_TopoJSON.js"
 
 // Parse the date / time
 var parseDate = d3.timeParse("%Y-%m-%d");
@@ -9,6 +10,8 @@ var parseDate = d3.timeParse("%Y-%m-%d");
 var newCases = document.getElementById("newCases");
 var activeCases = document.getElementById("activeCases");
 var dailyCasesLine = document.getElementById("d3line");
+var IndiaMap = document.getElementById("indiaMap");
+var IndiaMap_JSON = "../Resources/Covid19IndiaOrg_india.json"
 
 d3.csv("./Resources/state_wise_daily_Query.csv").then((All_data) => {
   All_data.forEach(function (d) {
@@ -69,8 +72,11 @@ d3.csv("./Resources/state_wise_daily_Query.csv").then((All_data) => {
   const line_activeCases = new Active_Case_Line(activeCases, Total_data);
   // const line_dailyCasesOld = new Daily_Case_Line(dailyCasesLine, Total_data);
 
+  const India_Map = new Map(IndiaMap, IndiaMap_JSON);
+
   bar_dailyCases.draw();
   line_activeCases.draw();
   // line_dailyCasesOld.draw();
   line_dailyCases.draw();
+  India_Map.draw();
 });

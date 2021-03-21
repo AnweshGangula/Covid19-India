@@ -25,28 +25,7 @@
     </div>
     <div id="indiaMap"> </div>
     <script>
-        //Source: https://stackoverflow.com/a/66622694/6908282
-        let width = 900,
-            height = 600;
 
-        let path = d3.geoPath()
-        // .projection(null);
-
-        let svg = d3.select("#indiaMap").append("svg")
-            .attr("width", width)
-            .attr("height", height);
-
-        fetch("../Resources/Covid19IndiaOrg_india.json")
-            .then(response => response.json())
-            .then(json => {
-                svg.append("g")
-                    .selectAll("path")
-                    .data(topojson.feature(json, json.objects.states).features)
-                    .enter()
-                    .append("path")
-                    .attr("d", path)
-                    .attr("class", "state");
-            });
     </script>
 </body>
 

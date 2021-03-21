@@ -67,4 +67,6 @@ path.state {
 
 path.state:hover {
   fill: red;
+  /* stroke: black;
+  stroke-width: 1px; */
 }
