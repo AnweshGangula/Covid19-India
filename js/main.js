@@ -45,7 +45,7 @@ d3.csv("./Resources/state_wise_daily_Query.csv").then((All_data) => {
   let maxDate = dateRange[1];
 
   var Current_Data = All_data.filter((d) => {
-    return Date.parse(d.Date_YMD) === Date.parse(maxDate);
+    return Date.parse(d.Date_YMD) === Date.parse(maxDate) && d["State Abbr"] !== "_TT";
   });
 
   // console.log(Total_data.slice(0, 2));
@@ -72,7 +72,7 @@ d3.csv("./Resources/state_wise_daily_Query.csv").then((All_data) => {
   const line_activeCases = new Active_Case_Line(activeCases, Total_data);
   // const line_dailyCasesOld = new Daily_Case_Line(dailyCasesLine, Total_data);
 
-  const India_Map = new Map(IndiaMap, IndiaMap_JSON);
+  const India_Map = new Map(IndiaMap, IndiaMap_JSON, Current_Data);
 
   bar_dailyCases.draw();
   line_activeCases.draw();
