@@ -215,8 +215,8 @@ class Line_Chart {
 
       this.yObjs[y].tooltip
         .append("rect")
-        .attr("x", 8)
-        .attr("y", -8)
+        // .attr("x", 8)
+        // .attr("y", -8)
         .attr("rx", 3)
         .attr("ry", 3)
         .attr("height", "1.2em")
@@ -253,12 +253,15 @@ class Line_Chart {
 
     function mousemove(xScale, data) {
       const bisect = d3.bisector(xFun).left;
-      var x0 = xScale.invert(d3.pointer(event, this)[0]),
+      let [mx, my] = d3.pointer(event, this)
+      var x0 = xScale.invert(mx),
         i = bisect(data, x0, 1),
         d0 = data[i - 1],
         d1 = data[i];
       // error at this line
       var d = x0 - xFun(d0) > xFun(d1) - x0 ? d1 : d0;
+      let anchor = mx > gVar.width - 100 && mx > 150 ? 'end' : 'start'
+      let anchorX = mx > gVar.width - 100 && mx > 150 ? -15 : 10
 
       var minY = gVar.height - gVar.margin.top - gVar.margin.bottom;
       for (var y in yData) {
@@ -268,14 +271,18 @@ class Line_Chart {
         );
         yData[y].tooltip
           .select("text")
-          .text(formatValue(parseInt(yData[y].yFunct(d))));
+          .text(formatValue(parseInt(yData[y].yFunct(d))))
+          .attr("x", anchorX)
+          .attr('text-anchor', anchor);
         minY = Math.min(minY, ySc(yData[y].yFunct(d)));
 
         // Update the text background rectangle size
         const text = yData[y].tooltip.select("text")
-        const { xpos, ypos, width: w, height: h } = text.node().getBBox();
+        const { x: xpos, y: ypos, width: w, height: h } = text.node().getBBox();
         yData[y].tooltip
           .selectAll("rect")
+          .attr("x", xpos)
+          .attr("y", ypos)
           .data([null]).join("text")
           .attr("width", parseInt(w) + 5)
       }
