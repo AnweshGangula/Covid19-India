@@ -11,7 +11,7 @@ var newCases = document.getElementById("newCases");
 var activeCases = document.getElementById("activeCases");
 var dailyCasesLine = document.getElementById("d3line");
 var IndiaMap = document.getElementById("indiaMap");
-var IndiaMap_JSON = "../Resources/Covid19IndiaOrg_india.json"
+var IndiaMap_JSON = "./Resources/Covid19IndiaOrg_india.json"
 
 d3.csv("./Resources/state_wise_daily_Query.csv").then((All_data) => {
   All_data.forEach(function (d) {
