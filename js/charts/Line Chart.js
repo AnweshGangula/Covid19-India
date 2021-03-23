@@ -200,7 +200,7 @@ class Line_Chart {
       .attr("y2", gVar.height - gVar.margin.bottom);
 
     // Year label
-    tooltips.append("text").attr("class", "tooltips year");
+    tooltips.append("text").attr("class", "tooltips year").attr("y", 7);
     // .attr("x", 20)
     // .attr("y", 0);
 
@@ -283,7 +283,7 @@ class Line_Chart {
       tooltips
         .select(".tooltips .line")
         .attr("transform", `translate(${xSc(xFun(d))})`)
-        .attr("y1", "0.5em");
+        .attr("y1", "1em");
       tooltips
         .select(".tooltips .year")
         .text(formatDate(xFun(d)))

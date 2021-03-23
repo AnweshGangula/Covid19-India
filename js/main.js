@@ -25,14 +25,14 @@ d3.csv("./Resources/state_wise_daily_Query.csv").then((All_data) => {
     return d["State Abbr"] === "_TT" /* && d.Actual < 500 */;
   });
 
-  var Cum_Confirmed = d3.cumsum(Total_data, (d) => d.Confirmed);
-  var Cum_Recovered = d3.cumsum(Total_data, (d) => d.Recovered);
-  var Cum_Deceased = d3.cumsum(Total_data, (d) => d.Deceased);
+  var Cm_Confirmed = d3.cumsum(Total_data, (d) => d.Confirmed);
+  var Cm_Recovered = d3.cumsum(Total_data, (d) => d.Recovered);
+  var Cm_Deceased = d3.cumsum(Total_data, (d) => d.Deceased);
 
   for (var i = 0; i < Total_data.length; i++) {
-    Total_data[i].Cum_Confirmed = Cum_Confirmed[i];
-    Total_data[i].Cum_Recovered = Cum_Recovered[i];
-    Total_data[i].Cum_Deceased = Cum_Deceased[i];
+    Total_data[i].Cm_Confirmed = Cm_Confirmed[i];
+    Total_data[i].Cm_Recovered = Cm_Recovered[i];
+    Total_data[i].Cm_Deceased = Cm_Deceased[i];
   }
 
   let dates = [];
@@ -49,19 +49,19 @@ d3.csv("./Resources/state_wise_daily_Query.csv").then((All_data) => {
   });
 
   // console.log(Total_data.slice(0, 2));
-  // console.log(Total_data.map((a) => a.Cum_Recovered));
+  // console.log(Total_data.map((a) => a.Cm_Recovered));
 
   // Draw D3 Charts
-  const line_dailyCases_list = {
-    Line1: { column: "Cum_Confirmed" },
-    Line2: { column: "Cum_Deceased" },
-    Line3: { column: "Cum_Recovered" },
+  const line_Comparision_list = {
+    Line1: { column: "Cm_Confirmed" },
+    Line2: { column: "Cm_Deceased" },
+    Line3: { column: "Cm_Recovered" },
   };
-  const line_dailyCases = new Line_Chart(
+  const line_Comparision = new Line_Chart(
     dailyCasesLine,
     Total_data,
     "Date_YMD",
-    line_dailyCases_list
+    line_Comparision_list
   );
 
   const bar_dailyCases = new Daily_Cases_Bar(newCases, Total_data, {
@@ -70,13 +70,13 @@ d3.csv("./Resources/state_wise_daily_Query.csv").then((All_data) => {
   });
 
   const line_activeCases = new Active_Case_Line(activeCases, Total_data);
-  // const line_dailyCasesOld = new Daily_Case_Line(dailyCasesLine, Total_data);
+  // const line_ComparisionOld = new Daily_Case_Line(dailyCasesLine, Total_data);
 
   const India_Map = new Map(IndiaMap, IndiaMap_JSON, Current_Data);
 
+  India_Map.draw();
   bar_dailyCases.draw();
   line_activeCases.draw();
-  // line_dailyCasesOld.draw();
-  line_dailyCases.draw();
-  India_Map.draw();
+  // line_ComparisionOld.draw();
+  line_Comparision.draw();
 });

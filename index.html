@@ -13,20 +13,22 @@
 </head>
 
 <body>
-    <h1 style="text-align: center; border-bottom: 1px solid;">The Mountains and Plateaus of COVID19</h1>
-    <div id="newCases" style="width: 60vw;   float: right; margin-right: 50px;">
-        <strong>Daily New Cases</strong>
+    <h1 id="title">The Mountains and Plateaus of COVID19</h1>
+    <div id="covidCharts">
+        <div id="indiaMap"></div>
+        <div id="newCases">
+            <strong>Daily New Cases</strong>
+        </div>
+        <div id="activeCases">
+            <strong>Active Cases</strong>
+        </div>
+        <div id="d3line">
+            <strong>Confirmed vs Recovered</strong>
+        </div>
     </div>
-    <div id="activeCases" style="width: 60vw;   float: right; margin-right: 50px;">
-        <strong>Active Cases</strong>
-    </div>
-    <div id="d3line" style="width: 60vw;   float: right; margin-right: 50px;">
-        <strong>Confirmed vs Recovered</strong>
-    </div>
-    <div id="indiaMap" style="position: fixed; float: left;"> </div>
-    <script>
-
-    </script>
+    <footer>
+        DataSource: <a href="https://api.covid19india.org/">https://api.covid19india.org/</a>
+    </footer>
 </body>
 
 </html>
