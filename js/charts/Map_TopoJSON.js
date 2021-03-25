@@ -30,11 +30,13 @@ class Map {
 
         this.chart = d3.select(this.element).append("svg")
             .attr("width", width)
-            .attr("height", height);
+            .attr("height", height)
+            .attr("viewBox", [0, 0, width, height]);
 
         this.plot = this.chart.append("g")
 
-        this.plot.attr("id", "Map").attr("transform", "scale(1.3)");
+        this.plot.attr("id", "Map")
+            .attr("transform", "scale(1.3)");
 
         // reference for "new Map" - https://observablehq.com/@gangula/covid-19-india-map
         let new_data = new Map(this.CurrentData.map(function (d) { return [d.State, +d.Active]; }))
@@ -72,19 +74,21 @@ class Map {
             .attr("class", "tooltip")
             .style("opacity", 0)
 
-        let svg = this.chart
+        let svg = this.element
 
         this.plot
             .on("touchmove mousemove mouseover", function (event, d) {
                 // Using d3.pointer to adjust with transform: scale - Reference: https://stackoverflow.com/q/64189608/6908282
-                let [mx, my] = d3.pointer(event, svg.node());
+                let [mx, my] = d3.pointer(event, svg);
+                let svgPos = svg.getBoundingClientRect() //Reference: https://stackoverflow.com/questions/442404/retrieve-the-position-x-y-of-an-html-element-relative-to-the-browser-window?rq=1
+                let [tipX, tipY] = [mx + svgPos.x, my + svgPos.y]
                 // console.log(mouse)
                 let hover_data = event.path[0].__data__
                 tooltip_div.transition().style("opacity", 0.9);
                 tooltip_div
                     .html(`<b>${hover_data.id}</b><br>${hover_data.Active.toLocaleString()}`)
-                    .style("left", `${mx}px`)
-                    .style("top", `${my - 3}px`);
+                    .style("left", `${tipX}px`)
+                    .style("top", `${tipY - 40}px`);
             })
             .on("touchend mouseleave", function (d) {
                 tooltip_div.transition().style("opacity", 0);

@@ -63,7 +63,7 @@ class Line_Chart {
     this.yScale = d3
       .scaleLinear()
       .range([gVar.height - gVar.margin.bottom, gVar.margin.top])
-      .domain([0, d3.max(this.yFuncts.map(this.max))]);
+      .domain([0, d3.max(this.yFuncts.map(this.max)) * 1.05]);
   }
 
   drawAxis() {

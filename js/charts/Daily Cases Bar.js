@@ -11,15 +11,17 @@ class Daily_Cases_Bar {
 
   draw() {
     // Adds the svg canvas
-    const chart = d3.select(this.element).append("svg");
+    this.chart = d3.select(this.element).append("svg");
 
-    chart
+    this.chart
       .attr("width", gVar.width + gVar.margin.left + gVar.margin.right)
       .attr("height", gVar.height + gVar.margin.top + gVar.margin.bottom)
       .attr("viewBox", [0, 0, gVar.width, gVar.height])
       .classed("svg-container", true);
 
-    this.plot = chart.append("g").attr("fill", "royalblue");
+    this.plot = this.chart.append("g")
+
+    this.plot.attr("fill", "royalblue");
 
     this.createScales();
     this.drawAxis();
@@ -104,15 +106,20 @@ class Daily_Cases_Bar {
 
     const yF = (d) => this.yFunct(d);
     const xF = (d) => this.xFunct(d);
+    let svg = this.element
+    console.log(svg)
     this.plot
       .selectAll("rect")
       .on("touchmove mousemove", function (event, d) {
+        let [mx, my] = d3.pointer(event, svg);
+        let svgPos = svg.getBoundingClientRect() //Reference: https://stackoverflow.com/questions/442404/retrieve-the-position-x-y-of-an-html-element-relative-to-the-browser-window?rq=1
+        let [tipX, tipY] = [mx + svgPos.x, my + svgPos.y]
         const no_cases = yF(d).toLocaleString();
         tooltip_div.transition().style("opacity", 0.9);
         tooltip_div
           .html("<b>" + formatTime(xF(d)) + "</b>" + "<br/>" + no_cases)
-          .style("left", event.pageX + "px")
-          .style("top", event.pageY - 38 + "px");
+          .style("left", tipX + "px")
+          .style("top", tipY - 38 + "px");
       })
       .on("touchend mouseleave", function (d) {
         tooltip_div.transition().style("opacity", 0);

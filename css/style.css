@@ -16,12 +16,10 @@ body {
 }
 
 #covidCharts {
-  display: flex;
-  flex-direction: column;
-  /* align-items: center; */
-  justify-content: center;
+  /* display: flex; */
+  margin: auto;
   padding-top: 4em;
-  margin: 0 15px;
+  /* margin: 0 15px; */
 }
 
 #indiaMap {
@@ -32,21 +30,18 @@ body {
   margin-left: 20px;
 }
 
-@media (min-width: 1600px) {
-  #indiaMap {
-    position: fixed;
-  }
+#indiaMap svg {
+  height: unset;
+  width: 100%;
+}
 
+@media (min-width: 1000px) {
   #covidCharts {
-    align-items: flex-end;
-    justify-content: right;
-  }
-  #d3line,
-  #activeCases,
-  #newCases {
-    width: unset !important;
+    display: flex;
+    justify-content: center;
   }
 }
+
 #d3line,
 #activeCases,
 #newCases {
@@ -59,13 +54,12 @@ body {
 }
 
 .svg-container {
-  /* min-width: 1000px; */
-  /* width: 100%; */
-  /* height: unset; */
+  width: 100%;
+  height: unset;
 }
 
 .tooltip {
-  position: absolute;
+  position: fixed;
   text-align: center;
   /* width: 60px; */
   /* height: 28px; */
@@ -110,8 +104,10 @@ path.area {
   display: flex;
 }
 
-.line-legend * {
-  margin-right: 10px;
+.line-legend {
+  margin: 0 !important;
+  justify-content: end;
+  flex-wrap: wrap;
 }
 
 #d3line .series-marker {
