@@ -16,8 +16,8 @@ class Map {
         // .projection(null);
 
         let latestDate = this.CurrentData[0].Date_YMD
-        let Cases_Range = d3.extent(this.CurrentData, (d) => +d.Active)
-        let Avg_Cases = parseInt(d3.mean(this.CurrentData, (d) => +d.Active))
+        let Cases_Range = d3.extent(this.CurrentData, (d) => d.Active)
+        let Avg_Cases = parseInt(d3.mean(this.CurrentData, (d) => d.Active))
         // let color = d3.scaleLinear().range(["#D4EEFF", "#0099FF"]).domain(Cases_Range);
         let color = d3.scaleSequential(d3.interpolateYlOrRd).domain(Cases_Range);
 
@@ -39,7 +39,7 @@ class Map {
             .attr("transform", "scale(1.3)");
 
         // reference for "new Map" - https://observablehq.com/@gangula/covid-19-india-map
-        let new_data = new Map(this.CurrentData.map(function (d) { return [d.State, +d.Active]; }))
+        let new_data = new Map(this.CurrentData.map(function (d) { return [d.State, d.Active]; }))
         // console.log(new_data)
 
         // Primise.all reference: https://stackoverflow.com/a/51113326/6908282
@@ -53,7 +53,7 @@ class Map {
             const CasesById = {};
             const mapData = topojson.feature(files[0], files[0].objects.states);
 
-            cases.forEach(d => { CasesById[d.State] = +d.Active; });
+            cases.forEach(d => { CasesById[d.State] = d.Active; });
             mapData.features.forEach(d => { d.Active = CasesById[d.id] });
 
             svg.selectAll("path")
@@ -77,7 +77,7 @@ class Map {
         let svg = this.element
 
         this.plot
-            .on("touchmove mousemove mouseover", function (event, d) {
+            .on("touchstart touchmove mousemove mouseover", function (event, d) {
                 // Using d3.pointer to adjust with transform: scale - Reference: https://stackoverflow.com/q/64189608/6908282
                 let [mx, my] = d3.pointer(event, svg);
                 let svgPos = svg.getBoundingClientRect() //Reference: https://stackoverflow.com/questions/442404/retrieve-the-position-x-y-of-an-html-element-relative-to-the-browser-window?rq=1

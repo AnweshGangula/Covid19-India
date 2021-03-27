@@ -135,7 +135,7 @@ class Active_Case_Line {
       const x_val = (x) => this.xScale(x);
       const y_val = (y) => this.yScale(y);
       const data = this.data;
-      this.chart.on("touchmove mousemove", function (event) {
+      this.chart.on("touchstart touchmove mousemove", function (event) {
         const bData = bisectFun(Xscale, data);
         tooltip
           .style("opacity", 0.9)
@@ -213,27 +213,19 @@ function callout(g, value) {
   const length = w + Props.pad * 2;
   const height = h + Props.pad * 1.5;
 
-  const tooltipPath_old = `M${-length / 2}, 5H-5l5,-5l5, 5H${
-    length / 2
-  }v${height}h-${length}z`;
+  const tooltipPath_old = `M${-length / 2}, 5H-5l5,-5l5, 5H${length / 2
+    }v${height}h-${length}z`;
 
-  const tooltipPath = `M -${length / 2} ${5 + Props.bzr} Q -${length / 2} 5 -${
-    length / 2 - Props.bzr
-  } 5 H -5 l 5 -5 l 5 5 H ${length / 2 - Props.bzr} Q ${length / 2} 5 ${
-    length / 2
-  } ${5 + Props.bzr} v ${height - 5 - Props.bzr - 1} Q ${
-    length / 2
-  } ${height} ${length / 2 - 1} ${height} h -${length - 3} Q -${
-    length / 2
-  } ${height} -${length / 2} ${height - 1} z`;
+  const tooltipPath = `M -${length / 2} ${5 + Props.bzr} Q -${length / 2} 5 -${length / 2 - Props.bzr
+    } 5 H -5 l 5 -5 l 5 5 H ${length / 2 - Props.bzr} Q ${length / 2} 5 ${length / 2
+    } ${5 + Props.bzr} v ${height - 5 - Props.bzr - 1} Q ${length / 2
+    } ${height} ${length / 2 - 1} ${height} h -${length - 3} Q -${length / 2
+    } ${height} -${length / 2} ${height - 1} z`;
 
-  const tooltipPath_small = `M -${length / 2} ${5 + Props.bzr} Q -${
-    length / 2
-  } 5 -${length / 2 - Props.bzr} 5 H -5 l 5 -5 l 5 5 H ${
-    length / 2 - Props.bzr
-  } Q ${length / 2} 5 ${length / 2} ${5 + Props.bzr} v${
-    height - 5
-  }h-${length}z`;
+  const tooltipPath_small = `M -${length / 2} ${5 + Props.bzr} Q -${length / 2
+    } 5 -${length / 2 - Props.bzr} 5 H -5 l 5 -5 l 5 5 H ${length / 2 - Props.bzr
+    } Q ${length / 2} 5 ${length / 2} ${5 + Props.bzr} v${height - 5
+    }h-${length}z`;
 
   path.attr("d", tooltipPath).attr("transform", `translate(0,3)`);
 }

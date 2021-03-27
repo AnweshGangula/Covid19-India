@@ -5,31 +5,44 @@ import Line_Chart from "./charts/Line Chart.js";
 import Map from "./charts/Map_TopoJSON.js"
 
 // Parse the date / time
-var parseDate = d3.timeParse("%Y-%m-%d");
+const parseDate = d3.timeParse("%Y-%m-%d");
 
-var newCases = document.getElementById("newCases");
-var activeCases = document.getElementById("activeCases");
-var dailyCasesLine = document.getElementById("d3line");
-var IndiaMap = document.getElementById("indiaMap");
-var IndiaMap_JSON = "./Resources/Covid19IndiaOrg_india.json"
+const CSVfilePath = "./Resources/state_wise_daily_Query.csv"
+const newCases = document.getElementById("newCases");
+const activeCases = document.getElementById("activeCases");
+const dailyCasesLine = document.getElementById("d3line");
+const IndiaMap = document.getElementById("indiaMap");
+const IndiaMap_JSON = "./Resources/Covid19IndiaOrg_india.json"
 
-d3.csv("./Resources/state_wise_daily_Query.csv").then((All_data) => {
+const testAsync = await testAsyncAwait(CSVfilePath);
+
+async function testAsyncAwait(filePath) {
+  const response = await fetch(filePath);
+  const data = await response.text();
+
+  return data
+}
+
+const csvData = await d3.csv(CSVfilePath)
+RenderCharts(csvData)
+
+function RenderCharts(All_data) {
   All_data.forEach(function (d) {
     d.Date_YMD = parseDate(d.Date_YMD);
     d.Confirmed = +d.Confirmed;
     d.Recovered = +d.Recovered;
     d.Deceased = +d.Deceased;
-    d.Actual = +d.Actual;
+    d.Active = +d.Active;
   });
-  var Total_data = All_data.filter((d) => {
+  const Total_data = All_data.filter((d) => {
     return d["State Abbr"] === "_TT" /* && d.Actual < 500 */;
   });
 
-  var Cm_Confirmed = d3.cumsum(Total_data, (d) => d.Confirmed);
-  var Cm_Recovered = d3.cumsum(Total_data, (d) => d.Recovered);
-  var Cm_Deceased = d3.cumsum(Total_data, (d) => d.Deceased);
+  const Cm_Confirmed = d3.cumsum(Total_data, (d) => d.Confirmed);
+  const Cm_Recovered = d3.cumsum(Total_data, (d) => d.Recovered);
+  const Cm_Deceased = d3.cumsum(Total_data, (d) => d.Deceased);
 
-  for (var i = 0; i < Total_data.length; i++) {
+  for (let i = 0; i < Total_data.length; i++) {
     Total_data[i].Cm_Confirmed = Cm_Confirmed[i];
     Total_data[i].Cm_Recovered = Cm_Recovered[i];
     Total_data[i].Cm_Deceased = Cm_Deceased[i];
@@ -44,7 +57,7 @@ d3.csv("./Resources/state_wise_daily_Query.csv").then((All_data) => {
   let minDate = dateRange[0];
   let maxDate = dateRange[1];
 
-  var Current_Data = All_data.filter((d) => {
+  const Current_Data = All_data.filter((d) => {
     return Date.parse(d.Date_YMD) === Date.parse(maxDate) && d["State Abbr"] !== "_TT";
   });
 
@@ -79,4 +92,4 @@ d3.csv("./Resources/state_wise_daily_Query.csv").then((All_data) => {
   line_activeCases.draw();
   // line_ComparisionOld.draw();
   line_Comparision.draw();
-});
+};

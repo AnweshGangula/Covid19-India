@@ -107,10 +107,10 @@ class Daily_Cases_Bar {
     const yF = (d) => this.yFunct(d);
     const xF = (d) => this.xFunct(d);
     let svg = this.element
-    console.log(svg)
+
     this.plot
       .selectAll("rect")
-      .on("touchmove mousemove", function (event, d) {
+      .on("touchstart touchmove mousemove", function (event, d) {
         let [mx, my] = d3.pointer(event, svg);
         let svgPos = svg.getBoundingClientRect() //Reference: https://stackoverflow.com/questions/442404/retrieve-the-position-x-y-of-an-html-element-relative-to-the-browser-window?rq=1
         let [tipX, tipY] = [mx + svgPos.x, my + svgPos.y]

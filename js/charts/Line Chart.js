@@ -237,7 +237,7 @@ class Line_Chart {
     sleep(duration).then(() => {
       const xSc = this.xScale;
       const data = this.data;
-      this.chart.on("touchmove mousemove", function (event) {
+      this.chart.on("touchstart touchmove mousemove", function (event) {
         tooltips.style("opacity", 0.9);
         mousemove(xSc, data, this.yObjs);
       });
