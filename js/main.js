@@ -7,7 +7,7 @@ import Map from "./charts/Map_TopoJSON.js"
 // Parse the date / time
 const parseDate = d3.timeParse("%Y-%m-%d");
 
-const CSVfilePath = "./Resources/state_wise_daily_Query.csv"
+const CSVfilePath = "./Resources/state_wise_daily - Python.csv"
 const newCases = document.getElementById("newCases");
 const activeCases = document.getElementById("activeCases");
 const dailyCasesLine = document.getElementById("d3line");
@@ -35,7 +35,7 @@ function RenderCharts(All_data) {
     d.Active = +d.Active;
   });
   const Total_data = All_data.filter((d) => {
-    return d["State Abbr"] === "_TT" /* && d.Actual < 500 */;
+    return d["State_Abbr"] === "_TT" /* && d.Actual < 500 */;
   });
 
   const Cm_Confirmed = d3.cumsum(Total_data, (d) => d.Confirmed);
@@ -58,7 +58,7 @@ function RenderCharts(All_data) {
   let maxDate = dateRange[1];
 
   const Current_Data = All_data.filter((d) => {
-    return Date.parse(d.Date_YMD) === Date.parse(maxDate) && d["State Abbr"] !== "_TT";
+    return Date.parse(d.Date_YMD) === Date.parse(maxDate) && d["State_Abbr"] !== "_TT";
   });
 
   // console.log(Total_data.slice(0, 2));
