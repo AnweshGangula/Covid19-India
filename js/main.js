@@ -7,7 +7,7 @@ import Map from "./charts/Map_TopoJSON.js"
 // Parse the date / time
 const parseDate = d3.timeParse("%Y-%m-%d");
 
-const CSVfilePath = "./Resources/state_wise_daily - Python.csv"
+const CSVfilePath = "./Resources/state_wise_daily_Python.csv"
 const newCases = document.getElementById("newCases");
 const activeCases = document.getElementById("activeCases");
 const dailyCasesLine = document.getElementById("d3line");

@@ -27,14 +27,14 @@ df_pivoted = df_pivoted.sort_values(
 
 # Expand State Abbreviations
 df_merged = pd.merge(df_pivoted, statesAbbr, on=["State_Abbr"], how="left")
-df_merged["Daily Active"] = (
+df_merged["Active Variance"] = (
     df_merged["Confirmed"] - df_merged["Recovered"] - df_merged["Deceased"]
 )
-df = df_merged.groupby(["Date_YMD", "State_Abbr"])[["Daily Active"]].sum()
+df = df_merged.groupby(["Date_YMD", "State_Abbr"])[["Active Variance"]].sum()
 
 # cumsum reference: https://stackoverflow.com/a/48070870/6908282
 df_merged["Active"] = df_merged.groupby(
-    ["State_Abbr"])["Daily Active"].cumsum()
+    ["State_Abbr"])["Active Variance"].cumsum()
 
 # Trim strings to remove leading and trailing spaces: https://stackoverflow.com/a/40950485/6908282
 df_trim = df_merged.select_dtypes(['object'])
@@ -42,7 +42,7 @@ df_merged[df_trim.columns] = df_trim.apply(lambda x: x.str.strip())
 
 print(df_merged.head())
 
-df_merged.to_csv(".\Resources\state_wise_daily - Python.csv", index=False)
+df_merged.to_csv(".\Resources\state_wise_daily_Python.csv", index=False)
 
 # now check out this video to use this data in website: https://www.youtube.com/watch?v=aoMzOgiE7rY
 #  another reference: https://stackoverflow.com/questions/13175510/call-python-function-from-javascript-code

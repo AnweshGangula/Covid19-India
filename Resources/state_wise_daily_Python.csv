@@ -1,4 +1,4 @@
-Date,Date_YMD,State_Abbr,Confirmed,Deceased,Recovered,State,Daily Active,Active
+Date,Date_YMD,State_Abbr,Confirmed,Deceased,Recovered,State,Active Variance,Active
 14-Mar-20,2020-03-14,AN,0,0,0,Andaman and Nicobar Islands,0,0
 14-Mar-20,2020-03-14,AP,1,0,0,Andhra Pradesh,1,1
 14-Mar-20,2020-03-14,AR,0,0,0,Arunachal Pradesh,0,0
@@ -15005,7 +15005,7 @@ Date,Date_YMD,State_Abbr,Confirmed,Deceased,Recovered,State,Daily Active,Active
 02-Apr-21,2021-04-02,PB,2873,57,2002,Punjab,814,25458
 02-Apr-21,2021-04-02,PY,213,1,82,Puducherry,130,1422
 02-Apr-21,2021-04-02,RJ,1422,2,499,Rajasthan,921,10484
-02-Apr-21,2021-04-02,SK,0,0,0,Sikkim,0,156
+02-Apr-21,2021-04-02,SK,4,0,3,Sikkim,1,157
 02-Apr-21,2021-04-02,TG,965,5,312,Telangana,648,5649
 02-Apr-21,2021-04-02,TN,3290,12,1715,Tamil Nadu,1563,18606
 02-Apr-21,2021-04-02,TR,4,0,5,Tripura,-1,82
@@ -15013,4 +15013,4 @@ Date,Date_YMD,State_Abbr,Confirmed,Deceased,Recovered,State,Daily Active,Active
 02-Apr-21,2021-04-02,UP,2953,16,782,Uttar Pradesh,2155,14073
 02-Apr-21,2021-04-02,UT,364,2,194,Uttarakhand,168,3905
 02-Apr-21,2021-04-02,WB,1733,4,550,West Bengal,1179,7692
-02-Apr-21,2021-04-02,_TT,89019,713,44176,,44130,659371
+02-Apr-21,2021-04-02,_TT,89023,713,44179,,44131,659372
