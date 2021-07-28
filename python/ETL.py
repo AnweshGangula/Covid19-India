@@ -1,3 +1,4 @@
+# Note: use code "python python\ETL.py" to run the code in terminal
 import pandas as pd
 
 CovidData = pd.read_csv(
@@ -47,4 +48,3 @@ df_merged.to_csv(".\Resources\state_wise_daily_Python.csv", index=False)
 # now check out this video to use this data in website: https://www.youtube.com/watch?v=aoMzOgiE7rY
 #  another reference: https://stackoverflow.com/questions/13175510/call-python-function-from-javascript-code
 
-# Note: use code "python python\ETL.py" to run above code in terminal
